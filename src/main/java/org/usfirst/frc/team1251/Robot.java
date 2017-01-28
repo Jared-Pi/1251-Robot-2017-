@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.IterativeRobot;
  */
 public class Robot extends IterativeRobot {
     private static final int PWM_PORT_0 = 0;
+    private static final int PWM_PORT_1 = 1;
 
 
     public void robotInit() {
