@@ -1,6 +1,7 @@
 package org.usfirst.frc.team1251;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.*;
 
 /**
  * Created by Eric Engelhart on 1/27/2017.
@@ -8,17 +9,21 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 
 public class Robot extends IterativeRobot {
     //Define Joystick input
-    private static final int LOGITECH_LEFT_JOYSTICK = 0;
-    private static final int LOGITECH_RIGHT_JOYSTICK = 1;
-    private static final int LOGITECH_X_BUTTON = 1;
-    private static final int LOGITECH_A_BUTTON = 2;
-    private static final int LOGITECH_B_BUTTON = 3;
-    private static final int LOGITECH_Y_BUTTON = 4;
-    private static final int LOGITECH_LEFT_TRIGGER = 7;
-    private static final int LOGITECH_RIGHT_TRIGGER = 8;
+    private static final int CONTROller_LEFT_BUMPER = 5;
+    private static final int CONTROLLER_RIGHT_BUMPER = 6;
+    private static final int CONTROLLER__LEFT_TRIGGER = 7;
+    private static final int CONTROLLER_RIGHT_TRIGGER = 8;
+    private static final int STICK_AXIS_ = 1;
+    private static final int STICK_TRIGGER = 1;
+    private static final int STICK_BUTTON_2 = 2;
+    private static final int STICK_BUTTON_3 = 3;
+    private static final int STICK_BUTTON_4 = 4;
+    private static final int STICK_BUTTON_5 = 5;
 
     //Define Joystick port
     private Joystick controller;
+    private Joystick stick1;
+    private Joystick stick2;
 
     //Define PWM ports
     private static final int PWM_PORT_0 = 0;
@@ -40,7 +45,9 @@ public class Robot extends IterativeRobot {
 
     public void robotInit() {
         //Declare joystick
-        controller = new Joytick(0);
+        controller = new Joystick(0);
+        stick1 = new Joystick(1);
+        stick2 = new Joystick(2);
 
         //Declare Speed controllers
         cim0 = new Talon(PWM_PORT_0);
@@ -49,18 +56,18 @@ public class Robot extends IterativeRobot {
         cim3 = new Talon(PWM_PORT_3);
 
         //Declare encoder
-        encoder = new Encoder(ENC_PORT_0, ENC_PORT_1)
+        encoder = new Encoder(ENC_PORT_0, ENC_PORT_1);
 
     }
     public void teleopInit() {
 
     }
     public void teleopPeriodic() {
-        if(controller.getRawButton(LOGITECH_A_BUTTON)) {
-            cim1.set(0.7);
+        if(controller.getRawButton(CONTROLLER_RIGHT_BUMPER)) {
+            cim1.set(-0.7);
         }
-        else (
+        else {
             cim1.set(0);
-        )
+        }
     }
 }
