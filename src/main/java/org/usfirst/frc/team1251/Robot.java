@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.IterativeRobot;
  */
 
 public class Robot extends IterativeRobot {
-    //Define Joystick input
+    //Define Joystick inputs
     private static final int CONTROller_LEFT_BUMPER = 5;
     private static final int CONTROLLER_RIGHT_BUMPER = 6;
     private static final int CONTROLLER__LEFT_TRIGGER = 7;
@@ -20,11 +20,6 @@ public class Robot extends IterativeRobot {
     private static final int STICK_BUTTON_4 = 4;
     private static final int STICK_BUTTON_5 = 5;
 
-    //Define Joystick port
-    private Joystick controller;
-    private Joystick stick1;
-    private Joystick stick2;
-
     //Define PWM ports
     private static final int PWM_PORT_0 = 0;
     private static final int PWM_PORT_1 = 1;
@@ -35,12 +30,29 @@ public class Robot extends IterativeRobot {
     private static final int PWM_PORT_6 = 6;
     private static final int PWM_PORT_7 = 7;
     private static final int PWM_PORT_8 = 8;
-    private static final int PWM_PORT_9 = 9;
 
-    private static final int ENC_PORT_0 = 0;
-    private static final int ENC_PORT_1 = 1;
-    private static final int ENC_PORT_2 = 2;
-    private static final int ENC_PORT_3 = 3;
+    //Define PCM ports
+    private static final int PCM_PORT_0 = 0;
+    private static final int PCM_PORT_1 = 1;
+    private static final int PCM_PORT_2 = 2;
+    private static final int PCM_PORT_3 = 3;
+    private static final int PCM_PORT_4 = 4;
+    private static final int PCM_PORT_5 = 5;
+    private static final int PCM_PORT_6 = 6;
+    private static final int PCM_PORT_7 = 7;
+
+    //Define DIO ports
+    private static final int DIO_PORT_0 = 0;
+    private static final int DIO_PORT_1 = 1;
+    private static final int DIO_PORT_2 = 2;
+    private static final int DIO_PORT_3 = 3;
+    private static final int DIO_PORT_4 = 4;
+    private static final int DIO_PORT_5 = 5;
+
+    //Define Joystick ports
+    private Joystick controller;
+    private Joystick stick1;
+    private Joystick stick2;
 
     //Define Speed controllers
     private Talon leftDrive1;
@@ -53,15 +65,19 @@ public class Robot extends IterativeRobot {
     private Talon gearCollector;
     private Talon hanger;
 
-    //Define pneumatics
-    private Doublesolenoid driveBase;
-    private Doublesolenoid ballCollector;
-    private Doublesolenoid gearClaw;
-    private Doublesolenoid gearPivot;
+    //Define Solenoids
+    private DoubleSolenoid driveBase;
+    private DoubleSolenoid ballCollectorPivot;
+    private DoubleSolenoid gearClaw;
+    private DoubleSolenoid gearPivot;
 
     //Define encoder
     private Encoder driveEncoder;
     private Encoder shooterEncoder;
+
+    //Define Sensors
+    private DigitalInput hangLLimit;
+    private DigitalInput gearLimit;
 
     public void robotInit() {
         //Declare joystick
@@ -74,20 +90,32 @@ public class Robot extends IterativeRobot {
         leftDrive2 = new Talon(PWM_PORT_1);
         rightDrive1 = new Talon(PWM_PORT_2);
         rightDrive2 = new Talon(PWM_PORT_3);
+        shooter = new Talon(PWM_PORT_4);
+        agitator = new Talon(PWM_PORT_5);
+        ballCollector = new Talon(PWM_PORT_6);
+        gearCollector = new Talon(PWM_PORT_7);
+        hanger = new Talon(PWM_PORT_8);
+
+        //Declare Solenoids
+        driveBase = new DoubleSolenoid(PCM_PORT_0, PCM_PORT_1);
+        ballCollectorPivot = new DoubleSolenoid(PCM_PORT_2, PCM_PORT_3);
+        gearClaw = new DoubleSolenoid(PCM_PORT_4, PCM_PORT_5);
+        gearPivot = new DoubleSolenoid(PCM_PORT_6, PCM_PORT_7);
+
 
         //Declare encoder
-        encoder = new Encoder(ENC_PORT_0, ENC_PORT_1);
+        driveEncoder = new Encoder(DIO_PORT_0, DIO_PORT_1);
+        shooterEncoder = new Encoder(DIO_PORT_2, DIO_PORT_3);
+
+        //Declare Sensors
+        hangLLimit = new DigitalInput(DIO_PORT_4);
+        gearLimit = new DigitalInput(DIO_PORT_5);
 
     }
     public void teleopInit() {
 
     }
     public void teleopPeriodic() {
-        if(controller.getRawButton(CONTROLLER_RIGHT_BUMPER)) {
-            cim1.set(-0.7);
-        }
-        else {
-            cim1.set(0);
-        }
+
     }
 }
