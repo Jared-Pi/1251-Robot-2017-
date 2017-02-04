@@ -5,6 +5,7 @@ plugins {
     id "jaci.openrio.gradle.GradleRIO" version "2017.1.1"
 }
 
+
 frc {
     team = "1251"
     robotClass = "org.usfirst.frc.team1251.Robot"
@@ -13,6 +14,7 @@ frc {
 dependencies {
     compile wpilib()
     compile talonSrx()
+    compile fileTree(dir: 'libs', include: 'Pathfinder-Java.jar')
 }
 
 def robotManifest = {
