@@ -14,7 +14,7 @@ frc {
 dependencies {
     compile wpilib()
     compile talonSrx()
-    compile fileTree(dir: 'libs', include: 'Pathfinder-Java.jar')
+    compile files('libs/Pathfinder-Java.jar')
 }
 
 def robotManifest = {
