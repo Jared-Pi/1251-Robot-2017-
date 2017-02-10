@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 
 public class Robot extends IterativeRobot {
     //Define Joystick inputs
-    private static final int CONTROller_LEFT_BUMPER = 5;
+    private static final int CONTROLLER_LEFT_BUMPER = 5;
     private static final int CONTROLLER_RIGHT_BUMPER = 6;
     private static final int CONTROLLER__LEFT_TRIGGER = 7;
     private static final int CONTROLLER_RIGHT_TRIGGER = 8;
@@ -76,7 +76,6 @@ public class Robot extends IterativeRobot {
     private DigitalInput hangLLimit;
     private DigitalInput gearLimit;
 
-    @Override
     public void robotInit() {
         //Declare joystick
         controller = new Joystick(0);
@@ -108,22 +107,10 @@ public class Robot extends IterativeRobot {
 
     }
 
-    @Override
-    public void autonomousInit(){
-
-    }
-
-    @Override
-    public void autonomousPeriodic(){
-
-    }
-
-    @Override
     public void teleopInit() {
 
     }
 
-    @Override
     public void teleopPeriodic() {
         //Subsystem 1, Drivebase
         driveBase.tankDrive(stick2, stick1);
