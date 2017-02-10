@@ -51,8 +51,8 @@ public class Robot extends IterativeRobot {
 
     //Define Joystick ports
     private Joystick controller;
-    private Joystick stick1;
-    private Joystick stick2;
+    private Joystick left;
+    private Joystick right;
 
     //Define Speed controllers
     private RobotDrive driveBase;
@@ -80,8 +80,8 @@ public class Robot extends IterativeRobot {
     public void robotInit() {
         //Declare joystick
         controller = new Joystick(0);
-        stick1 = new Joystick(1);
-        stick2 = new Joystick(2);
+        left = new Joystick(1);
+        right = new Joystick(2);
 
         //Declare Speed controllers
 
@@ -126,7 +126,7 @@ public class Robot extends IterativeRobot {
     @Override
     public void teleopPeriodic() {
         //Subsystem 1, Drivebase
-        driveBase.tankDrive(stick2, stick1);
+        TT_Drive.drive(left, right, driveBase);
 
         if (controller.getRawButton(CONTROLLER_RIGHT_BUMPER)) {
             driveBaseShifter.set(DoubleSolenoid.Value.kForward);
