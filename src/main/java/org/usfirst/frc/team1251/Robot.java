@@ -76,6 +76,7 @@ public class Robot extends IterativeRobot {
     private DigitalInput hangLLimit;
     private DigitalInput gearLimit;
 
+    @Override
     public void robotInit() {
         //Declare joystick
         controller = new Joystick(0);
@@ -106,9 +107,23 @@ public class Robot extends IterativeRobot {
         gearLimit = new DigitalInput(DIO_PORT_5);
 
     }
+
+    @Override
+    public void autonomousInit(){
+
+    }
+
+    @Override
+    public void autonomousPeriodic(){
+
+    }
+
+    @Override
     public void teleopInit() {
 
     }
+
+    @Override
     public void teleopPeriodic() {
         //Subsystem 1, Drivebase
         driveBase.tankDrive(stick2, stick1);
