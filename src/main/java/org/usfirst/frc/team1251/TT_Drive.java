@@ -14,6 +14,8 @@ public class TT_Drive {
 
     private static final int DRIVE_MULTIPLIER = 1;
 
+    private static final int RPM_SWITCH = 3000;
+    private static final int loopsToSwitch = 16;
 
     public static void drive(Joystick left, Joystick right, RobotDrive base){
         base.tankDrive(left.getRawAxis(1)*DRIVE_MULTIPLIER, right.getRawAxis(1)*DRIVE_MULTIPLIER);
