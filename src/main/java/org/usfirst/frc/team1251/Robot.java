@@ -28,13 +28,20 @@ public class Robot extends IterativeRobot {
 // Max Velocity:        1.7 m/s
 // Max Acceleration:    2.0 m/s/s
 // Max Jerk:            60.0 m/s/s/s
-    Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, Trajectory.Config.SAMPLES_HIGH, 0.05, 1.7, 2.0, 60.0);
+    Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC,
+            Trajectory.Config.SAMPLES_HIGH, 0.05, 1.7, 2.0, 60.0);
 
     // Generate the trajectory
     Trajectory trajectory = Pathfinder.generate(points, config);
 
+    int trajectoryIndex = 0;
     public void robotInit(){
 
+    }
+
+    public void autonomousInit(){
+        Trajectory.Segment currentSegment = trajectory.get(trajectoryIndex);
+        trajectoryIndex++;
     }
 
     public void teleopInit(){
@@ -42,6 +49,8 @@ public class Robot extends IterativeRobot {
     }
 
     public void teleopPeriodic(){
+
+
 
     }
 
