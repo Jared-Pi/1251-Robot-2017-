@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.RobotDrive;
  */
 public class TT_Drive {
     public static void drive(Joystick left, Joystick right, RobotDrive base){
-
+        base.tankDrive(left.getRawAxis(1), right.getRawAxis(1));
     }
 
 }
