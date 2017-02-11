@@ -7,19 +7,21 @@ import edu.wpi.first.wpilibj.*;
  */
 
 public class TT_Shooter {
+    static int loopTimer = 0;
     public static void shoot(Encoder shooterController, Joystick joystick, Talon shooter, Talon actuator) {
-        boolean ifPressed = joystick.getRawButton(1);
-        boolean ifPressedActuator = joystick.getRawButton(2);
-        int loopTimer = 0;
-        if (loopTimer == 2.0){
-            if (ifPressed) {
-                shooter.set(1.0);
-                if (shooterController.get() == 5) {
+        if (joystick.getRawButton(1)) {
+            shooter.set(1.0);
+            if (loopTimer == 5) {
+                if (joystick.getRawButton(2)) {
                     actuator.set(1.0);
+                } else {
+                    actuator.set(0);
                 }
             }
+        } else {
+            shooter.set(0);
+            loopTimer++;
         }
-
     }
 }
 
