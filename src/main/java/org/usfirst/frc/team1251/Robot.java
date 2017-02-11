@@ -88,7 +88,6 @@ public class Robot extends IterativeRobot {
         right = new Joystick(2);
 
         //Declare Speed controllers
-
         driveBase = new RobotDrive(PWM_PORT_0, PWM_PORT_1, PWM_PORT_2, PWM_PORT_3);
         shooter = new Talon(PWM_PORT_4);
         agitator = new Talon(PWM_PORT_5);

@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 
-import static org.usfirst.frc.team1251.Util.convertToRPMs;
+import static org.usfirst.frc.team1251.TT_Util.convertToRPMs;
 
 /**
  * Created by Eric Engelhart on 2/10/2017.
