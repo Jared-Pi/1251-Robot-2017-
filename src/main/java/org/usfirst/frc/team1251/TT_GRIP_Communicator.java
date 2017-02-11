@@ -5,12 +5,12 @@ import edu.wpi.first.wpilibj.networktables.NetworkTable;
 /**
  * Created by Eric Engelhart on 2/11/2017.
  */
-public class GRIP_Communicator {
+public class TT_GRIP_Communicator {
     private NetworkTable gripTable;
 
     private double[] defaultValues;
 
-    public GRIP_Communicator(NetworkTable gripTable){
+    public TT_GRIP_Communicator(NetworkTable gripTable){
         this.gripTable = gripTable;
         defaultValues = new double[0];
     }

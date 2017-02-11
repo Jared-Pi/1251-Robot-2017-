@@ -79,7 +79,7 @@ public class Robot extends IterativeRobot {
     private DigitalInput gearLimit;
 
     //Define network table grip communicator
-    private GRIP_Communicator gripCommunicator;
+    private TT_GRIP_Communicator gripCommunicator;
 
     public void robotInit() {
         //Declare joystick
@@ -110,7 +110,7 @@ public class Robot extends IterativeRobot {
         hangLLimit = new DigitalInput(DIO_PORT_4);
         gearLimit = new DigitalInput(DIO_PORT_5);
 
-        gripCommunicator = new GRIP_Communicator(NetworkTable.getTable("GRIP"));
+        gripCommunicator = new TT_GRIP_Communicator(NetworkTable.getTable("GRIP"));
 
     }
 
