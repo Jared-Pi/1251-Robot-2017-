@@ -52,8 +52,8 @@ public class Robot extends IterativeRobot {
 
     //Define Joystick ports
     private Joystick controller;
-    private Joystick left;
-    private Joystick right;
+    private Joystick leftStick;
+    private Joystick rightStick;
 
     //Define Speed controllers
     private RobotDrive driveBase;
@@ -75,8 +75,11 @@ public class Robot extends IterativeRobot {
     private Encoder shooterEncoder;
 
     //Define Sensors
-    private DigitalInput hangLLimit;
+    private DigitalInput hangLimit;
     private DigitalInput gearLimit;
+
+    //Define booleans
+    public static boolean lockControls = false;
 
     //Define network table grip communicator
     private TT_GRIP_Communicator gripCommunicator;
@@ -84,8 +87,8 @@ public class Robot extends IterativeRobot {
     public void robotInit() {
         //Declare joystick
         controller = new Joystick(0);
-        left = new Joystick(1);
-        right = new Joystick(2);
+        leftStick = new Joystick(1);
+        rightStick = new Joystick(2);
 
         //Declare Speed controllers
         driveBase = new RobotDrive(PWM_PORT_0, PWM_PORT_1, PWM_PORT_2, PWM_PORT_3);
@@ -107,7 +110,7 @@ public class Robot extends IterativeRobot {
         shooterEncoder = new Encoder(DIO_PORT_4, DIO_PORT_5);
 
         //Declare Sensors
-        hangLLimit = new DigitalInput(DIO_PORT_4);
+        hangLimit = new DigitalInput(DIO_PORT_4);
         gearLimit = new DigitalInput(DIO_PORT_5);
 
         gripCommunicator = new TT_GRIP_Communicator(NetworkTable.getTable("GRIP"));
@@ -119,10 +122,16 @@ public class Robot extends IterativeRobot {
     }
 
     public void teleopPeriodic() {
-        //Subsystem 1, Drivebase
-        TT_Drive.drive(left, right, driveBase);
-        TT_Drive.shifter(driveEncoderLeft, driveEncoderRight, driveBaseShifter);
-
-
+        if(!lockControls) {
+            //Subsystem 1, Drivebase
+            TT_Drive.drive(leftStick, rightStick, driveBase);
+            TT_Drive.shifter(driveEncoderLeft, driveEncoderRight, driveBaseShifter);
+            TT_Hanger.hang(controller, hanger, hangLimit);
+        }
+        else{
+            TT_Drive.drive(leftStick, rightStick, driveBase);
+            TT_Hanger.hang(controller, hanger, hangLimit);
+        }
+        
     }
 }
