@@ -7,7 +7,7 @@ public class TT_Util {
 
     public static double convertToRPMs(double speed){
         // divide by ticks per revolution
-        speed /= 256;
+        speed /= 125;
         // divide by seconds per minute
         speed /= 60;
         return speed;
