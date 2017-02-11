@@ -53,11 +53,11 @@ public class TT_Drive {
                 if (lowGearLoopTimer > loopsToSwitch){
 
                     solenoid.set(LOW_GEAR);
-                }else {
+                } else {
 
                     lowGearLoopTimer++;
                 }
-            }else{
+            } else {
 
                 lowGearLoopTimer = 0;
             }
