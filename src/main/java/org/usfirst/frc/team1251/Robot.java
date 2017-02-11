@@ -2,6 +2,7 @@ package org.usfirst.frc.team1251;
 
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 /**
  * Created by Eric Engelhart on 1/27/2017.
@@ -77,6 +78,9 @@ public class Robot extends IterativeRobot {
     private DigitalInput hangLLimit;
     private DigitalInput gearLimit;
 
+    //Define network table grip communicator
+    private GRIP_Communicator gripCommunicator;
+
     public void robotInit() {
         //Declare joystick
         controller = new Joystick(0);
@@ -106,6 +110,8 @@ public class Robot extends IterativeRobot {
         //Declare Sensors
         hangLLimit = new DigitalInput(DIO_PORT_4);
         gearLimit = new DigitalInput(DIO_PORT_5);
+
+        gripCommunicator = new GRIP_Communicator(NetworkTable.getTable("GRIP"));
 
     }
 
