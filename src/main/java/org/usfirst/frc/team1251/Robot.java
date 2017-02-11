@@ -69,7 +69,8 @@ public class Robot extends IterativeRobot {
     private DoubleSolenoid gearPivot;
 
     //Define encoder
-    private Encoder driveEncoder;
+    private Encoder driveEncoderLeft;
+    private Encoder driveEncoderRight;
     private Encoder shooterEncoder;
 
     //Define Sensors
@@ -98,8 +99,9 @@ public class Robot extends IterativeRobot {
         gearPivot = new DoubleSolenoid(PCM_PORT_6, PCM_PORT_7);
 
         //Declare encoder
-        driveEncoder = new Encoder(DIO_PORT_0, DIO_PORT_1);
-        shooterEncoder = new Encoder(DIO_PORT_2, DIO_PORT_3);
+        driveEncoderLeft = new Encoder(DIO_PORT_0, DIO_PORT_1);
+        driveEncoderRight = new Encoder(DIO_PORT_2, DIO_PORT_3);
+        shooterEncoder = new Encoder(DIO_PORT_4, DIO_PORT_5);
 
         //Declare Sensors
         hangLLimit = new DigitalInput(DIO_PORT_4);
@@ -114,13 +116,7 @@ public class Robot extends IterativeRobot {
     public void teleopPeriodic() {
         //Subsystem 1, Drivebase
         TT_Drive.drive(left, right, driveBase);
-
-        if (controller.getRawButton(CONTROLLER_RIGHT_BUMPER)) {
-            driveBaseShifter.set(DoubleSolenoid.Value.kForward);
-        }
-        else {
-            driveBaseShifter.set(DoubleSolenoid.Value.kReverse);
-        }
+        TT_Drive.shifter(driveEncoderLeft, driveEncoderRight, driveBaseShifter);
 
 
     }
