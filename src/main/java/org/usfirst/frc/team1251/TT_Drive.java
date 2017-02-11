@@ -18,6 +18,8 @@ public class TT_Drive {
     private static final double RPM_LIMIT = 3000;
     private static final int loopsToSwitch = 16;
 
+    private static int loopTimer = 0;
+
     public static void drive(Joystick left, Joystick right, RobotDrive base) {
         base.tankDrive(left.getRawAxis(1)*DRIVE_MULTIPLIER, right.getRawAxis(1)*DRIVE_MULTIPLIER);
     }
@@ -26,16 +28,16 @@ public class TT_Drive {
         double nLeft = convertToRPMs(left.getRate());
         double nRight = convertToRPMs(right.getRate());
 
-
-        if (true) {
-            if (nLeft > RPM_LIMIT && nRight > RPM_LIMIT) {
+        if (nLeft > RPM_LIMIT && nRight > RPM_LIMIT ) {
+            if (loopsToSwitch > loopTimer) {
                 solenoid.set(HIGH_GEAR);
-            } else {
-                solenoid.set(LOW_GEAR);
+            }
+            else{
+                loopTimer += 1;
             }
         }
-            else{
-
-            }
+        else {
+            solenoid.set(LOW_GEAR);
+        }
     }
 }
