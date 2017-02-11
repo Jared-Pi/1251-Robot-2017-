@@ -24,4 +24,12 @@ public class TT_Drive {
     public static void shifter(Encoder left, Encoder right, DoubleSolenoid solenoid) {
 
     }
+
+    public static double convertToRPMs(double speed){
+        // divide by ticks per revolution
+        speed /= 256;
+        // divide by seconds per minute
+        speed /= 60;
+        return speed;
+    }
 }
