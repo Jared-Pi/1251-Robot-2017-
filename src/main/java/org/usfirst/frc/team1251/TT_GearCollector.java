@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.Talon;
  * Created by Jared on 2/11/2017.
  */
 public class TT_GearCollector {
-    public static void collectGear(Joystick controller, Talon motor, DoubleSolenoid pivot, DoubleSolenoid claw, DigitalInput senosor) {
+    public static void collectGear(Joystick controller, Talon motor, DoubleSolenoid pivot, DoubleSolenoid claw, DigitalInput sensor) {
 
     }
 }
