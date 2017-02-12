@@ -1,28 +1,23 @@
 package org.usfirst.frc.team1251;
 
-import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PIDController;
+import edu.wpi.first.wpilibj.Talon;
 
 /**
  * Created by Nicholas Salazar on 2/10/2017.
  */
 
 public class TT_Shooter {
-    static int loopTimer = 0;
-    public static void shoot(Encoder shooterController, Joystick joystick, Talon shooter, Talon actuator) {
+
+    private static final int Shooter_RPMs = 2200;
+    public static void shoot( Joystick joystick, Talon actuator, PIDController shooterPID) {
         if (joystick.getRawButton(1)) {
-            shooter.set(1.0);
-            if (loopTimer == 5) {
-                if (joystick.getRawButton(2)) {
-                    actuator.set(1.0);
-                } else {
-                    actuator.set(0);
-                }
-            }
+            shooterPID.setSetpoint(TT_Util.convertRPMsToTicks(Shooter_RPMs));
+
         } else {
-            shooter.set(0);
-            loopTimer++;
+
         }
     }
 }
 
-//I have no idea what I'm doing lol.

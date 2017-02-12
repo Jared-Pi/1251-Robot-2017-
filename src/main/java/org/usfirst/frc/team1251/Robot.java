@@ -84,6 +84,13 @@ public class Robot extends IterativeRobot {
     //Define network table grip communicator
     private TT_GRIP_Communicator gripCommunicator;
 
+    //Define PIDs
+    private double shooter_P = 0;
+    private double shooter_I = 0;
+    private double shooter_D = 0;
+
+    private PIDController shooterPID;
+
     public void robotInit() {
         //Declare joystick
         controller = new Joystick(0);
@@ -115,6 +122,8 @@ public class Robot extends IterativeRobot {
 
         gripCommunicator = new TT_GRIP_Communicator(NetworkTable.getTable("GRIP"));
 
+        shooterPID = new PIDController(shooter_P, shooter_I, shooter_D, shooterEncoder, shooter, 1);
+
     }
 
     public void teleopInit() {
@@ -132,6 +141,8 @@ public class Robot extends IterativeRobot {
             TT_Drive.drive(leftStick, rightStick, driveBase);
             TT_Hanger.hang(controller, hanger, hangLimit);
         }
+
+        TT_Shooter.shoot(controller, agitator, shooterPID);
         
     }
 }
