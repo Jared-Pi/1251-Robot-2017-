@@ -7,8 +7,8 @@ import edu.wpi.first.wpilibj.Talon;
 /**
  * Created by Jared on 2/11/2017.
  */
-public class TT_Collector {
-    public static void collect(Joystick controller, Talon motor, DoubleSolenoid solenoid) {
+public class TT_BallCollector {
+    public static void collectBall(Joystick controller, Talon motor, DoubleSolenoid solenoid) {
         if (controller.getRawButton(6)) {
             motor.set(1.0);
         }
