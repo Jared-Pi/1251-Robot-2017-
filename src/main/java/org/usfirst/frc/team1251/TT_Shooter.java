@@ -11,12 +11,20 @@ import edu.wpi.first.wpilibj.Talon;
 public class TT_Shooter {
 
     private static final int Shooter_RPMs = 2200;
-    public static void shoot( Joystick joystick, Talon actuator, PIDController shooterPID) {
+    private static final int loopsTillAgitation = 40;
+
+    private static int agitationCounter = 0;
+
+    public static void shoot( Joystick joystick, Talon agitator, PIDController shooterPID) {
         if (joystick.getRawButton(1)) {
             shooterPID.setSetpoint(TT_Util.convertRPMsToTicks(Shooter_RPMs));
-
+            if (agitationCounter > loopsTillAgitation){
+                agitator.set(1);
+            } else {
+                agitationCounter++;
+            }
         } else {
-
+            agitationCounter = 0;
         }
     }
 }
