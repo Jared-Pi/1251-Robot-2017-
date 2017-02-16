@@ -13,7 +13,7 @@ public class TT_Drive {
     private static final DoubleSolenoid.Value LOW_GEAR = DoubleSolenoid.Value.kReverse;
 
     private static final int DRIVE_MULTIPLIER = 1;
-    private static final double RPM_LIMIT = 3000;
+    private static final double RPM_LIMIT = 3000.0;
     private static final int loopsToSwitch = 16;
 
     private static int lowGearLoopTimer = 0;
