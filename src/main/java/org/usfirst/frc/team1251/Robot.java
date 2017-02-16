@@ -1,7 +1,6 @@
 package org.usfirst.frc.team1251;
 
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 /**
@@ -49,6 +48,7 @@ public class Robot extends IterativeRobot {
     private static final int DIO_PORT_3 = 3;
     private static final int DIO_PORT_4 = 4;
     private static final int DIO_PORT_5 = 5;
+    private static final String GRIP_TABLE_NAME = "GRIP";
 
     //Define Joystick ports
     private Joystick controller;
@@ -85,12 +85,13 @@ public class Robot extends IterativeRobot {
     private TT_GRIP_Communicator gripCommunicator;
 
     //Define PIDs
-    private double shooter_P = 0;
-    private double shooter_I = 0;
-    private double shooter_D = 0;
+    private final double shooter_P = 0;
+    private final double shooter_I = 0;
+    private final double shooter_D = 0;
 
     private PIDController shooterPID;
 
+    @Override
     public void robotInit() {
         //Declare joystick
         controller = new Joystick(0);
@@ -120,16 +121,18 @@ public class Robot extends IterativeRobot {
         hangLimit = new DigitalInput(DIO_PORT_4);
         gearLimit = new DigitalInput(DIO_PORT_5);
 
-        gripCommunicator = new TT_GRIP_Communicator(NetworkTable.getTable("GRIP"));
+        gripCommunicator = new TT_GRIP_Communicator(NetworkTable.getTable(GRIP_TABLE_NAME));
 
         shooterPID = new PIDController(shooter_P, shooter_I, shooter_D, shooterEncoder, shooter, 1);
 
     }
 
+    @Override
     public void teleopInit() {
 
     }
 
+    @Override
     public void teleopPeriodic() {
         if(!lockControls) {
             //Subsystem 1, Drivebase
