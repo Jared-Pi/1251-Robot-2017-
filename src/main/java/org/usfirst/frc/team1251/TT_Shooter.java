@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.Talon;
 
 public class TT_Shooter {
 
-    private static final int Shooter_RPMs = 2200;
+    private static final int SHOOTER_RPMS = 2200;
     private static final int LOOPS_TILL_AGITATION = 40;
 
     private static int agitationCounter = 0;
@@ -18,7 +18,7 @@ public class TT_Shooter {
     public static void shoot( Joystick joystick, Talon agitator, PIDController shooterPID) {
         if (joystick.getRawButton(1)) {
 
-            shooterPID.setSetpoint(TT_Util.convertRPMsToTicks(Shooter_RPMs));
+            shooterPID.setSetpoint(TT_Util.convertRPMsToTicks(SHOOTER_RPMS));
             if (agitationCounter > LOOPS_TILL_AGITATION){
                 agitator.set(1);
             } else {
