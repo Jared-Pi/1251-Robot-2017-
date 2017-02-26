@@ -5,7 +5,7 @@ package org.usfirst.frc.team1251;
  */
 public class TT_Util {
 
-    public static double convertTicksToRPMsHangar(double speed){
+    public static double convertTicksToRPMsHanger(double speed){
         // divide by ticks per revolution
         speed /= 1024;
         // divide by seconds per minute
