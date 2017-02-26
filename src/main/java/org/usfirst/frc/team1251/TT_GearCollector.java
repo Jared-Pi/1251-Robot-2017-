@@ -16,7 +16,7 @@ public class TT_GearCollector {
         if (controller.getRawButton(7)) { //Check how the controller is utilised, e.g. button or axis; This will be for from floor
             pivot.set(DoubleSolenoid.Value.kForward);
             claw.set(DoubleSolenoid.Value.kForward);
-            while (!sensor.get()) {
+            if (!sensor.get()) {
                 motor.set(-1);
             }
             claw.set(DoubleSolenoid.Value.kReverse);

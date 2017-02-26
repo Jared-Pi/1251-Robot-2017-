@@ -48,6 +48,8 @@ public class Robot extends IterativeRobot {
     private static final int DIO_PORT_3 = 3;
     private static final int DIO_PORT_4 = 4;
     private static final int DIO_PORT_5 = 5;
+    private static final int DIO_PORT_6 = 6;
+    private static final int DIO_PORT_7 = 7;
     private static final String GRIP_TABLE_NAME = "GRIP";
 
     //Define Joystick ports
@@ -73,9 +75,9 @@ public class Robot extends IterativeRobot {
     private Encoder driveEncoderLeft;
     private Encoder driveEncoderRight;
     private Encoder shooterEncoder;
+    private Encoder hangLimit;
 
     //Define Sensors
-    private DigitalInput hangLimit;
     private DigitalInput gearLimit;
 
     //Define booleans
@@ -116,9 +118,9 @@ public class Robot extends IterativeRobot {
         driveEncoderLeft = new Encoder(DIO_PORT_0, DIO_PORT_1);
         driveEncoderRight = new Encoder(DIO_PORT_2, DIO_PORT_3);
         shooterEncoder = new Encoder(DIO_PORT_4, DIO_PORT_5);
+        hangLimit = new Encoder(DIO_PORT_6, DIO_PORT_7);
 
         //Declare Sensors
-        hangLimit = new DigitalInput(DIO_PORT_4);
         gearLimit = new DigitalInput(DIO_PORT_5);
 
         gripCommunicator = new TT_GRIP_Communicator(NetworkTable.getTable(GRIP_TABLE_NAME));
@@ -134,18 +136,10 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void teleopPeriodic() {
-        if(!lockControls) {
-            //Subsystem 1, Drivebase
-            TT_Drive.drive(leftStick, rightStick, driveBase);
-            TT_Drive.shifter(driveEncoderLeft, driveEncoderRight, driveBaseShifter);
-            TT_Hanger.hang(controller, hanger, hangLimit);
-        }
-        else{
-            TT_Drive.drive(leftStick, rightStick, driveBase);
-            TT_Hanger.hang(controller, hanger, hangLimit);
-        }
-
+        //Subsystem 1, Drivebase
+        TT_Drive.drive(leftStick, rightStick, driveBase);
+        TT_Drive.shifter(driveEncoderLeft, driveEncoderRight, driveBaseShifter);
+        TT_Hanger.hang(controller, hanger, hangLimit);
         TT_Shooter.shoot(controller, agitator, shooterPID);
-        
     }
 }
