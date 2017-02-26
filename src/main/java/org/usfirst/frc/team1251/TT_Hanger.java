@@ -20,7 +20,7 @@ public class TT_Hanger {
                     counter++;
                 }
                 else {
-                    if (convertTicksToRPMs(limit.getRate()) <  50) {
+                    if (convertTicksToRPMsHanger(limit.getRate()) <  50) {
                         motor.set(0);
                     }
                 }
