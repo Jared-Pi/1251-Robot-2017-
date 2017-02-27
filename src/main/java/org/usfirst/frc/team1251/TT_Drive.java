@@ -5,6 +5,8 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 
+import static org.usfirst.frc.team1251.Robot.STICK_AXIS;
+
 /**
  * Created by Eric Engelhart on 2/10/2017.
  */
@@ -20,7 +22,8 @@ public class TT_Drive {
     private static int highGearLoopTimer = 0;
 
     public static void drive(Joystick left, Joystick right, RobotDrive base) {
-        base.tankDrive(left.getRawAxis(1) * DRIVE_MULTIPLIER, right.getRawAxis(1)*DRIVE_MULTIPLIER);
+
+        base.tankDrive(-left.getRawAxis(STICK_AXIS) * DRIVE_MULTIPLIER, -right.getRawAxis(STICK_AXIS)*DRIVE_MULTIPLIER);
     }
 
     public static void shifter(Encoder left, Encoder right, DoubleSolenoid solenoid) {
