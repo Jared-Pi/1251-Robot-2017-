@@ -153,8 +153,10 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void teleopInit() {
-        //TODO: This is only for the practice bot because the encoders are mounted opposite each other
+        //this is due to reversed encoders in both bots
         driveEncoderRight.setReverseDirection(true);
+        //it is 0.00050779561 meters per tick, as can be seen in the google sheets
+        driveEncoderRight.setDistancePerPulse(0.00050779561);
     }
 
     @Override
@@ -170,5 +172,6 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putNumber("Right encoder", driveEncoderRight.get());
         SmartDashboard.putNumber("Left encoder rate", driveEncoderLeft.getRate());
         SmartDashboard.putNumber("Right encoder rate", driveEncoderRight.getRate());
+        SmartDashboard.putNumber("Right encoder distance", driveEncoderRight.getDistance());
     }
 }
