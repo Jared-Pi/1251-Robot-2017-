@@ -120,8 +120,8 @@ public class Robot extends IterativeRobot {
 
         //Declare Solenoids
         driveBaseShifter = new DoubleSolenoid(PCM_PORT_0, PCM_PORT_1);
-        ballCollectorPivot = new DoubleSolenoid(PCM_PORT_2, PCM_PORT_3);
-        gearClaw = new DoubleSolenoid(PCM_PORT_4, PCM_PORT_5);
+        ballCollectorPivot = new DoubleSolenoid(PCM_PORT_4, PCM_PORT_5);
+        gearClaw = new DoubleSolenoid(PCM_PORT_2, PCM_PORT_3);
 
         //Declare encoder
         driveEncoderLeft = new Encoder(DIO_PORT_0, DIO_PORT_1);
