@@ -2,6 +2,7 @@ package org.usfirst.frc.team1251;
 
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Created by Eric Engelhart on 1/27/2017.
@@ -152,6 +153,8 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void teleopInit() {
+        //TODO: This is only for the practice bot because the encoders are mounted opposite each other
+        driveEncoderRight.setReverseDirection(true);
     }
 
     @Override
@@ -162,5 +165,10 @@ public class Robot extends IterativeRobot {
         TT_Hanger.hang(controller, hanger, hangLimit);
         //TT_GearCollector(controller, )
        // TT_Shooter.shoot(controller, agitator, shooterPID);
+
+        SmartDashboard.putNumber("Left encoder", driveEncoderLeft.get());
+        SmartDashboard.putNumber("Right encoder", driveEncoderRight.get());
+        SmartDashboard.putNumber("Left encoder rate", driveEncoderLeft.getRate());
+        SmartDashboard.putNumber("Right encoder rate", driveEncoderRight.getRate());
     }
 }
