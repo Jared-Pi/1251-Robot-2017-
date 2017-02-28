@@ -1,6 +1,7 @@
 package org.usfirst.frc.team1251;
 
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -71,12 +72,13 @@ public class Robot extends IterativeRobot {
     private Talon ballCollector;
     private Talon gearCollector;
     private Talon hanger;
+    private Talon gearPivot;
 
     //Define Solenoids
     private DoubleSolenoid driveBaseShifter;
     private DoubleSolenoid ballCollectorPivot;
     private DoubleSolenoid gearClaw;
-    private DoubleSolenoid gearPivot;
+
 
     //Define encoder
     private Encoder driveEncoderLeft;
@@ -85,7 +87,7 @@ public class Robot extends IterativeRobot {
     private Encoder hangLimit;
 
     //Define Sensors
-    private DigitalInput gearLimit;
+    private Potentiometer gearPot;
 
     //Define booleans
     public static boolean lockControls = false;
@@ -113,13 +115,13 @@ public class Robot extends IterativeRobot {
         agitator = new Talon(PWM_PORT_5);
         ballCollector = new Talon(PWM_PORT_6);
         gearCollector = new Talon(PWM_PORT_7);
+        gearPivot = new Talon(PWM_PORT_8);
         hanger = new Talon(PWM_PORT_9);
 
         //Declare Solenoids
         driveBaseShifter = new DoubleSolenoid(PCM_PORT_0, PCM_PORT_1);
         ballCollectorPivot = new DoubleSolenoid(PCM_PORT_2, PCM_PORT_3);
         gearClaw = new DoubleSolenoid(PCM_PORT_4, PCM_PORT_5);
-        gearPivot = new DoubleSolenoid(PCM_PORT_6, PCM_PORT_7);
 
         //Declare encoder
         driveEncoderLeft = new Encoder(DIO_PORT_0, DIO_PORT_1);
@@ -173,5 +175,7 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putNumber("Left encoder rate", driveEncoderLeft.getRate());
         SmartDashboard.putNumber("Right encoder rate", driveEncoderRight.getRate());
         SmartDashboard.putNumber("Right encoder distance", driveEncoderRight.getDistance());
+
+        TT_GearCollector.collectGearFloor(controller, gearCollector, gearPivot, gearClaw, gearPot);
     }
 }
