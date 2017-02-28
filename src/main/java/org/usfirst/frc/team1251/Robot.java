@@ -111,11 +111,11 @@ public class Robot extends IterativeRobot {
 
         //Declare Speed controllers
         driveBase = new RobotDrive(PWM_PORT_2, PWM_PORT_3, PWM_PORT_0, PWM_PORT_1);
-        shooter = new Talon(PWM_PORT_4);
-        agitator = new Talon(PWM_PORT_5);
+        shooter = new Talon(PWM_PORT_8);
+        agitator = new Talon(PWM_PORT_7);
         ballCollector = new Talon(PWM_PORT_6);
-        gearCollector = new Talon(PWM_PORT_7);
-        gearPivot = new Talon(PWM_PORT_8);
+        gearCollector = new Talon(PWM_PORT_4);
+        gearPivot = new Talon(PWM_PORT_5);
         hanger = new Talon(PWM_PORT_9);
 
         //Declare Solenoids
