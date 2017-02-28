@@ -21,17 +21,17 @@ public class TT_GearCollector {
             if (pivotSensor.get() < 90) { */
                 pivotMotor.set(0.35);
             //} else {
-
+                //pivotMotor.set(0);
            // }
         } else if (controller.getRawAxis(1) < -0.1) {
           //  isDown = false;
             //if (pivotSensor.get() < 0) {
                 pivotMotor.set(-0.2);
            // } else {
-
+                //pivotMotor.set(0);
             //}
         } else {
-            pivotMotor.set(0);
+            pivotMotor.set(0.15);
         }
 
         if (controller.getRawButton(CONTROLLER_A_BUTTON)) {
