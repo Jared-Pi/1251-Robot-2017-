@@ -130,7 +130,7 @@ public class Robot extends IterativeRobot {
         hangLimit = new Encoder(DIO_PORT_6, DIO_PORT_7);
 
         //Declare Sensors
-        //gearLimit = new DigitalInput(DIO_PORT_5);
+        gearPot = new AnalogPotentiometer(0, 3600, 3);
 
         gripCommunicator = new TT_GRIP_Communicator(NetworkTable.getTable(GRIP_TABLE_NAME));
 
@@ -175,6 +175,8 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putNumber("Left encoder rate", driveEncoderLeft.getRate());
         SmartDashboard.putNumber("Right encoder rate", driveEncoderRight.getRate());
         SmartDashboard.putNumber("Right encoder distance", driveEncoderRight.getDistance());
+
+        SmartDashboard.putNumber("Pot", gearPot.get());
 
         TT_GearCollector.collectGearFloor(controller, gearCollector, gearPivot, gearClaw, gearPot);
     }
