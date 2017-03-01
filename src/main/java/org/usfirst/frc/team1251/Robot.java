@@ -66,7 +66,7 @@ public class Robot extends IterativeRobot {
     private Joystick rightStick;
 
     //Define Speed controllers
-    private RobotDrive driveBase;
+    public static RobotDrive driveBase;
     private Talon shooter;
     private Talon agitator;
     private Talon ballCollector;
@@ -81,8 +81,8 @@ public class Robot extends IterativeRobot {
 
 
     //Define encoder
-    private Encoder driveEncoderLeft;
-    private Encoder driveEncoderRight;
+    public static Encoder driveEncoderLeft;
+    public static Encoder driveEncoderRight;
     private Encoder shooterEncoder;
     private Encoder hangLimit;
 
@@ -101,6 +101,8 @@ public class Robot extends IterativeRobot {
     private final double shooter_D = 0;
 
     private PIDController shooterPID;
+
+    public static ADXRS450_Gyro gyro;
 
     @Override
     public void robotInit() {
@@ -135,6 +137,9 @@ public class Robot extends IterativeRobot {
         gripCommunicator = new TT_GRIP_Communicator(NetworkTable.getTable(GRIP_TABLE_NAME));
 
         shooterPID = new PIDController(shooter_P, shooter_I, shooter_D, shooterEncoder, shooter, 1);
+
+        gyro = new ADXRS450_Gyro();
+        gyro.calibrate();
     }
 
     @Override
