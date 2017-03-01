@@ -18,23 +18,27 @@ public class TT_Hanger {
 
     public static void hang(Joystick controller, SpeedController motor, Encoder limit){
         if(!limitReached) {
+
             if (controller.getRawButton(CONTROLLER_START_BUTTON)) {
+
                 motor.set(-1.0);
                 if(counter < COUNTER_MAX) {
+
                     counter++;
                 }
-                else {
-                    if (convertTicksToRPMsHanger(limit.getRate()) <  100) {
-                        limitReached = true;
-                    }
+                else if (convertTicksToRPMsHanger(limit.getRate()) <  100) {
+
+                    limitReached = true;
                 }
             }
             else {
+
                 counter =0;
                 motor.set(0);
             }
         }
         else {
+
             motor.set(0);
         }
     }
