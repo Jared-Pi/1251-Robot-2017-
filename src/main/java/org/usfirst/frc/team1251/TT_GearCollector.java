@@ -26,12 +26,12 @@ public class TT_GearCollector {
         } else if (controller.getRawAxis(1) < -0.1) {
           //  isDown = false;
             //if (pivotSensor.get() < 0) {
-                pivotMotor.set(-0.2);
-           // } else {
+                pivotMotor.set(-0.4);
+           // } else {g
                 //pivotMotor.set(0);
             //}
         } else {
-            pivotMotor.set(0.15);
+            pivotMotor.set(0.0);
         }
 
         if (controller.getRawButton(CONTROLLER_A_BUTTON)) {

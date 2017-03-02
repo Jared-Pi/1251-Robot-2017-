@@ -128,8 +128,8 @@ public class Robot extends IterativeRobot {
         //Declare encoder
         driveEncoderLeft = new Encoder(DIO_PORT_0, DIO_PORT_1);
         driveEncoderRight = new Encoder(DIO_PORT_2, DIO_PORT_3);
-        shooterEncoder = new Encoder(DIO_PORT_4, DIO_PORT_5);
-        hangLimit = new Encoder(DIO_PORT_6, DIO_PORT_7);
+        shooterEncoder = new Encoder(DIO_PORT_6, DIO_PORT_7);
+        hangLimit = new Encoder(DIO_PORT_4, DIO_PORT_5);
 
         //Declare Sensors
         gearPot = new AnalogPotentiometer(0, 3600, 3);
@@ -175,6 +175,8 @@ public class Robot extends IterativeRobot {
         //TT_GearCollector(controller, )
        // TT_Shooter.shoot(controller, agitator, shooterPID);
 
+
+
         SmartDashboard.putNumber("Left encoder", driveEncoderLeft.get());
         SmartDashboard.putNumber("Right encoder", driveEncoderRight.get());
         SmartDashboard.putNumber("Left encoder rate", driveEncoderLeft.getRate());
@@ -182,6 +184,8 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putNumber("Right encoder distance", driveEncoderRight.getDistance());
 
         SmartDashboard.putNumber("Pot", gearPot.get());
+
+        SmartDashboard.putNumber("Shooter", hangLimit.getRate());
 
         TT_GearCollector.collectGearFloor(controller, gearCollector, gearPivot, gearClaw, gearPot);
     }
