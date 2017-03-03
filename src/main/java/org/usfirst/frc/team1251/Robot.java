@@ -67,6 +67,12 @@ public class Robot extends IterativeRobot {
 
     //Define Speed controllers
     public static RobotDrive driveBase;
+
+    private Talon leftDrive1;
+    private Talon leftDrive2;
+    private Talon rightDrive1;
+    private Talon rightDrive2;
+
     private Talon shooter;
     private Talon agitator;
     private Talon ballCollector;
@@ -108,6 +114,8 @@ public class Robot extends IterativeRobot {
 
     private PIDController driveTestPID;
 
+    private TT_DoubleTalonPID driveTestDoubleTalonPID;
+
 
     public static ADXRS450_Gyro gyro;
 
@@ -118,8 +126,13 @@ public class Robot extends IterativeRobot {
         leftStick = new Joystick(1);
         rightStick = new Joystick(2);
 
+        leftDrive1 = new Talon(PWM_PORT_3);
+        leftDrive2 = new Talon(PWM_PORT_2);
+        rightDrive1 = new Talon(PWM_PORT_0);
+        rightDrive2 = new Talon(PWM_PORT_1);
+
         //Declare Speed controllers
-        driveBase = new RobotDrive(PWM_PORT_3, PWM_PORT_2, PWM_PORT_0, PWM_PORT_1);
+        driveBase = new RobotDrive(leftDrive1, leftDrive2, rightDrive1, rightDrive2);
         shooter = new Talon(PWM_PORT_8);
         agitator = new Talon(PWM_PORT_7);
         ballCollector = new Talon(PWM_PORT_6);
@@ -144,6 +157,12 @@ public class Robot extends IterativeRobot {
         gripCommunicator = new TT_GRIP_Communicator(NetworkTable.getTable(GRIP_TABLE_NAME));
 
         shooterPID = new PIDController(shooter_P, shooter_I, shooter_D, shooterEncoder, shooter, 1);
+
+        // set it to a rate based pid
+        driveEncoderLeft.setPIDSourceType(PIDSourceType.kRate);
+
+        driveTestDoubleTalonPID = new TT_DoubleTalonPID(leftDrive1, leftDrive2);
+        driveTestPID = new PIDController(drive_P, drive_I, drive_D, driveEncoderLeft, driveTestDoubleTalonPID, 10);
 
         gyro = new ADXRS450_Gyro();
         gyro.calibrate();
@@ -200,10 +219,24 @@ public class Robot extends IterativeRobot {
     @Override
     public void testInit() {
 
-
+        driveTestPID.enable();
     }
 
+    @Override
     public void testPeriodic() {
+        if (controller.getRawButton(CONTROLLER_A_BUTTON)){
+            driveTestPID.setSetpoint(1000);
+        } else {
+            driveTestPID.setSetpoint(0);
+        }
 
+        SmartDashboard.putNumber("Left Drive PID Test: ", TT_Util.convertTicksToRPMs(driveEncoderLeft.getRate()));
     }
+
+    @Override
+    public void disabledInit(){
+        driveTestPID.disable();
+    }
+
+
 }
