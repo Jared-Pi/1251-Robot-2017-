@@ -75,7 +75,7 @@ public class Robot extends IterativeRobot {
     private Talon gearPivot;
 
     //Define Solenoids
-    private DoubleSolenoid driveBaseShifter;
+    public static DoubleSolenoid driveBaseShifter;
     private DoubleSolenoid ballCollectorPivot;
     private DoubleSolenoid gearClaw;
 
@@ -112,7 +112,7 @@ public class Robot extends IterativeRobot {
         rightStick = new Joystick(2);
 
         //Declare Speed controllers
-        driveBase = new RobotDrive(PWM_PORT_2, PWM_PORT_3, PWM_PORT_0, PWM_PORT_1);
+        driveBase = new RobotDrive(PWM_PORT_3, PWM_PORT_2, PWM_PORT_0, PWM_PORT_1);
         shooter = new Talon(PWM_PORT_8);
         agitator = new Talon(PWM_PORT_7);
         ballCollector = new Talon(PWM_PORT_6);

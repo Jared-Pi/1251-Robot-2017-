@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SpeedController;
 
 import static org.usfirst.frc.team1251.Robot.CONTROLLER_START_BUTTON;
+import static org.usfirst.frc.team1251.Robot.CONTROLLER_Y_BUTTON;
 
 /**
  * Created by Jessa Ecle on 2/11/2017.
@@ -20,7 +21,7 @@ public class TT_Hanger {
 
             if (controller.getRawButton(CONTROLLER_START_BUTTON)) {
 
-                motor.set(-1.0);
+                motor.set(-0.3);
                 /*if(counter < COUNTER_MAX) {
 
                     counter++;
@@ -29,6 +30,9 @@ public class TT_Hanger {
 
                     limitReached = true;
                 }*/
+            }
+            else if (controller.getRawButton(CONTROLLER_Y_BUTTON)) {
+                motor.set(-1.0);
             }
             else {
 
