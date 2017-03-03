@@ -151,7 +151,7 @@ public class Robot extends IterativeRobot {
     public void autonomousPeriodic() {
         driveBaseShifter.set(DoubleSolenoid.Value.kForward);
         if (driveEncoderLeft.getDistance()<4000) {
-            driveBase.tankDrive(0.5,0.535);
+            driveBase.tankDrive(0.5,0.5);
         }
         else {
             driveBase.tankDrive(0,0);
