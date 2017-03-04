@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 
 public class Robot extends IterativeRobot {
+    private static int tempCounter = 0;
+
     //Define Joystick inputs
     public static final int CONTROLLER_X_BUTTON  = 1;
     public static final int CONTROLLER_A_BUTTON  = 2;
@@ -19,6 +21,7 @@ public class Robot extends IterativeRobot {
     public static final int CONTROLLER_RIGHT_BUMPER = 6;
     public static final int CONTROLLER__LEFT_TRIGGER = 7;
     public static final int CONTROLLER_RIGHT_TRIGGER = 8;
+    public static final int CONTROLLER_SELECT_BUTTON = 9;
     public static final int CONTROLLER_START_BUTTON = 10;
     public static final int STICK_AXIS = 1;
     public static final int STICK_TRIGGER = 1;
@@ -112,7 +115,7 @@ public class Robot extends IterativeRobot {
         rightStick = new Joystick(2);
 
         //Declare Speed controllers
-        driveBase = new RobotDrive(PWM_PORT_3, PWM_PORT_2, PWM_PORT_0, PWM_PORT_1);
+        driveBase = new RobotDrive(PWM_PORT_0, PWM_PORT_1, PWM_PORT_2, PWM_PORT_3);
         shooter = new Talon(PWM_PORT_8);
         agitator = new Talon(PWM_PORT_7);
         ballCollector = new Talon(PWM_PORT_6);
@@ -150,12 +153,13 @@ public class Robot extends IterativeRobot {
     @Override
     public void autonomousPeriodic() {
         driveBaseShifter.set(DoubleSolenoid.Value.kForward);
-        if (driveEncoderLeft.getDistance()<4000) {
-            driveBase.tankDrive(0.5,0.5);
+        if (tempCounter <= 150) {
+            driveBase.tankDrive(-0.535,-0.5);
         }
         else {
             driveBase.tankDrive(0,0);
         }
+        tempCounter++;
     }
 
     @Override

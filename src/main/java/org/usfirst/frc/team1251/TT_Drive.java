@@ -23,10 +23,10 @@ public class TT_Drive {
 
     public static void drive(Joystick left, Joystick right, RobotDrive base) {
 
-        base.tankDrive(-left.getRawAxis(STICK_AXIS) * DRIVE_MULTIPLIER, -right.getRawAxis(STICK_AXIS)*DRIVE_MULTIPLIER);
-        if (left.getRawButton(6) || left.getRawButton(11) || right.getRawButton(6) || right.getRawButton(6)){
+        base.tankDrive(left.getRawAxis(STICK_AXIS) * DRIVE_MULTIPLIER, right.getRawAxis(STICK_AXIS)*DRIVE_MULTIPLIER);
+        if (left.getRawButton(11) || left.getRawButton(10) || right.getRawButton(11) || right.getRawButton(10)){
             Robot.driveBaseShifter.set(HIGH_GEAR);
-        } else if (left.getRawButton(7) || left.getRawButton(10) || right.getRawButton(7) || right.getRawButton(10)){
+        } else if (left.getRawButton(6) || left.getRawButton(7) || right.getRawButton(6) || right.getRawButton(7)){
             Robot.driveBaseShifter.set(LOW_GEAR);
         }
     }
