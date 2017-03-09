@@ -10,25 +10,31 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 
 public class Robot extends IterativeRobot {
-    private static int tempCounter = 0;
 
     //Define Joystick inputs
+    public static final int CONTROLLER_LEFT_AXIS = 1;
+    public static final int CONTROLLER_RIGHT_AXIS  = 3;
     public static final int CONTROLLER_X_BUTTON  = 1;
     public static final int CONTROLLER_A_BUTTON  = 2;
     public static final int CONTROLLER_B_BUTTON = 3;
     public static final int CONTROLLER_Y_BUTTON = 4;
     public static final int CONTROLLER_LEFT_BUMPER = 5;
     public static final int CONTROLLER_RIGHT_BUMPER = 6;
-    public static final int CONTROLLER__LEFT_TRIGGER = 7;
+    public static final int CONTROLLER_LEFT_TRIGGER = 7;
     public static final int CONTROLLER_RIGHT_TRIGGER = 8;
     public static final int CONTROLLER_SELECT_BUTTON = 9;
     public static final int CONTROLLER_START_BUTTON = 10;
     public static final int STICK_AXIS = 1;
+    public static final int STICK_LEVEL = 2;
     public static final int STICK_TRIGGER = 1;
     public static final int STICK_BUTTON_2 = 2;
     public static final int STICK_BUTTON_3 = 3;
     public static final int STICK_BUTTON_4 = 4;
     public static final int STICK_BUTTON_5 = 5;
+    public static final int STICK_BUTTON_6 = 6;
+    public static final int STICK_BUTTON_7 = 7;
+    public static final int STICK_BUTTON_8 = 8;
+    public static final int STICK_BUTTON_9 = 9;
 
     //Define PWM ports
     private static final int PWM_PORT_0 = 0;
@@ -65,7 +71,7 @@ public class Robot extends IterativeRobot {
 
     //Define Joystick ports
     private Joystick controller;
-    private Joystick leftStick;
+    private Joystick stick;
     private Joystick rightStick;
 
     //Define Speed controllers
@@ -107,11 +113,13 @@ public class Robot extends IterativeRobot {
 
     public static ADXRS450_Gyro gyro;
 
+    public int autoSelect;
+
     @Override
     public void robotInit() {
         //Declare joystick
         controller = new Joystick(0);
-        leftStick = new Joystick(1);
+        stick = new Joystick(1);
         rightStick = new Joystick(2);
 
         //Declare Speed controllers
@@ -143,23 +151,25 @@ public class Robot extends IterativeRobot {
 
         gyro = new ADXRS450_Gyro();
         gyro.calibrate();
+
     }
 
     @Override
     public void autonomousInit() {
-
+        driveEncoderRight.setReverseDirection(true);
+        driveEncoderRight.setDistancePerPulse(0.00050779561);
+        driveEncoderLeft.setDistancePerPulse(0.00050779561);
+        autoSelect = (int) SmartDashboard.getNumber("Auto", -1);
+        SmartDashboard.putString("Autos", "1: Go past baseline\n2: Middle Gear");
     }
 
     @Override
     public void autonomousPeriodic() {
-        driveBaseShifter.set(DoubleSolenoid.Value.kForward);
-        if (tempCounter <= 150) {
-            driveBase.tankDrive(-0.535,-0.5);
-        }
-        else {
-            driveBase.tankDrive(0,0);
-        }
-        tempCounter++;
+        TT_MainAuto.auto(autoSelect, driveBase, driveBaseShifter, gearPivot, gearClaw, gyro, driveEncoderLeft, driveEncoderRight);
+
+        SmartDashboard.putNumber("auto left enc", driveEncoderLeft.getDistance());
+        SmartDashboard.putNumber("auto right enc", driveEncoderRight.getDistance());
+        SmartDashboard.putNumber("Gyro", gyro.getAngle());
     }
 
     @Override
@@ -168,29 +178,25 @@ public class Robot extends IterativeRobot {
         driveEncoderRight.setReverseDirection(true);
         //it is 0.00050779561 meters per tick, as can be seen in the google sheets
         driveEncoderRight.setDistancePerPulse(0.00050779561);
+        driveEncoderLeft.setDistancePerPulse(0.00050779561);
     }
 
     @Override
     public void teleopPeriodic() {
         //Subsystem 1, Drivebase
-        TT_Drive.drive(leftStick, rightStick, driveBase);
+        TT_Drive.drive(controller, driveBase);
         //TT_Drive.shifter(driveEncoderLeft, driveEncoderRight, driveBaseShifter);
-        TT_Hanger.hang(controller, hanger, hangLimit);
-        //TT_GearCollector(controller, )
-       // TT_Shooter.shoot(controller, agitator, shooterPID);
+       if (stick.getRawButton(CONTROLLER_SELECT_BUTTON) || stick.getRawButton(CONTROLLER_START_BUTTON)) {
+            TT_Hanger.hang(stick, hanger, hangLimit, gearPivot);
+        }
+        else {
+            hanger.set(0);
+            TT_GearCollector.collectGearFloor(stick, gearCollector, gearPivot, gearClaw, gearPot);
+        }
 
-
-
-        SmartDashboard.putNumber("Left encoder", driveEncoderLeft.get());
-        SmartDashboard.putNumber("Right encoder", driveEncoderRight.get());
         SmartDashboard.putNumber("Left encoder rate", driveEncoderLeft.getRate());
         SmartDashboard.putNumber("Right encoder rate", driveEncoderRight.getRate());
-        SmartDashboard.putNumber("Right encoder distance", driveEncoderRight.getDistance());
 
         SmartDashboard.putNumber("Pot", gearPot.get());
-
-        SmartDashboard.putNumber("Shooter", hangLimit.getRate());
-
-        TT_GearCollector.collectGearFloor(controller, gearCollector, gearPivot, gearClaw, gearPot);
     }
 }

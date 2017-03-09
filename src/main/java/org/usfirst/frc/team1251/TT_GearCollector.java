@@ -16,36 +16,27 @@ public class TT_GearCollector {
     public static boolean isDown = false;
 
     public static void collectGearFloor(Joystick controller, SpeedController collectionMotor, SpeedController pivotMotor, DoubleSolenoid claw, Potentiometer pivotSensor) {
-        if (controller.getRawAxis(1) > 0.1) {
-          /*  isDown = true;
-            if (pivotSensor.get() < 90) { */
-                pivotMotor.set(0.35);
-            //} else {
-                //pivotMotor.set(0);
-           // }
-        } else if (controller.getRawAxis(1) < -0.1) {
-          //  isDown = false;
-            //if (pivotSensor.get() < 0) {
-                pivotMotor.set(-0.4);
-           // } else {g
-                //pivotMotor.set(0);
-            //}
+        if ( controller.getRawAxis(CONTROLLER_LEFT_AXIS) > 0.1) {
+            pivotMotor.set(0.35);
+        } else if ( controller.getRawAxis(CONTROLLER_LEFT_AXIS) < -0.1) {
+            pivotMotor.set(-0.35);
         } else {
             pivotMotor.set(0.0);
         }
 
-        if (controller.getRawButton(CONTROLLER_A_BUTTON)) {
+        if ( controller.getRawButton(CONTROLLER_A_BUTTON)) {
             claw.set(DoubleSolenoid.Value.kReverse);
         } else {
             claw.set(DoubleSolenoid.Value.kForward);
         }
 
-        if (controller.getRawButton(CONTROLLER_RIGHT_BUMPER)) {
+        if ( controller.getRawButton(CONTROLLER_RIGHT_BUMPER)) {
             collectionMotor.set(1);
-
-        } else if (controller.getRawButton(CONTROLLER_RIGHT_TRIGGER)) {
+        }
+        else if ( controller.getRawButton(CONTROLLER_RIGHT_TRIGGER)) {
             collectionMotor.set(-1);
-        } else {
+        }
+        else {
             collectionMotor.set(0);
         }
     }

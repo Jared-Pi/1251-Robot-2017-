@@ -12,32 +12,22 @@ import static org.usfirst.frc.team1251.Robot.CONTROLLER_START_BUTTON;
  */
 public class TT_Hanger {
     public static boolean limitReached = false;
-    public static int counter = 0;
 
-    public static final int COUNTER_MAX = 15;
-
-    public static void hang(Joystick controller, SpeedController motor, Encoder limit){
+    public static void hang(Joystick controller, SpeedController motor, Encoder limit, SpeedController clawMotor){
         if(!limitReached) {
 
             if (controller.getRawButton(CONTROLLER_SELECT_BUTTON)) {
 
-                motor.set(-0.3);
-                /*if(counter < COUNTER_MAX) {
-
-                    counter++;
-                }
-                else if (convertTicksToRPMsHanger(limit.getRate()) <  100) {
-
-                    limitReached = true;
-                }*/
+                motor.set(0.3);
+                clawMotor.set(0.35);
             }
             else if (controller.getRawButton(CONTROLLER_START_BUTTON)) {
-                motor.set(-1.0);
+                motor.set(1.0);
+                clawMotor.set(0.35);
             }
             else {
-
-                counter = 0;
                 motor.set(0);
+                clawMotor.set(0);
             }
         }
         else {

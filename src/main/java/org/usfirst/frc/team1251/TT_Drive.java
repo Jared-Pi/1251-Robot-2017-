@@ -5,7 +5,8 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 
-import static org.usfirst.frc.team1251.Robot.STICK_AXIS;
+import static java.lang.Math.abs;
+import static org.usfirst.frc.team1251.Robot.*;
 
 /**
  * Created by Eric Engelhart on 2/10/2017.
@@ -21,12 +22,31 @@ public class TT_Drive {
     private static int lowGearLoopTimer = 0;
     private static int highGearLoopTimer = 0;
 
-    public static void drive(Joystick left, Joystick right, RobotDrive base) {
+    private static final double DRIVE_MINIMUM = 0.15;
+    private static double lAxis = 0;
+    private static double rAxis = 0;
 
-        base.tankDrive(left.getRawAxis(STICK_AXIS) * DRIVE_MULTIPLIER, right.getRawAxis(STICK_AXIS)*DRIVE_MULTIPLIER);
-        if (left.getRawButton(11) || left.getRawButton(10) || right.getRawButton(11) || right.getRawButton(10)){
+    public static void drive(Joystick controller, RobotDrive base) {
+
+        if(controller.getRawAxis(CONTROLLER_LEFT_AXIS)*abs(controller.getRawAxis(CONTROLLER_LEFT_AXIS))<DRIVE_MINIMUM) {
+            lAxis = controller.getRawAxis(CONTROLLER_LEFT_AXIS);
+        }
+        else {
+            lAxis = controller.getRawAxis(CONTROLLER_LEFT_AXIS)*abs(controller.getRawAxis(CONTROLLER_LEFT_AXIS));
+        }
+        if(controller.getRawAxis(CONTROLLER_RIGHT_AXIS)*abs(controller.getRawAxis(CONTROLLER_RIGHT_AXIS))<DRIVE_MINIMUM) {
+            rAxis = controller.getRawAxis(CONTROLLER_RIGHT_AXIS);
+        }
+        else {
+            rAxis = controller.getRawAxis(CONTROLLER_RIGHT_AXIS)*abs(controller.getRawAxis(CONTROLLER_RIGHT_AXIS));
+        }
+
+        base.tankDrive(lAxis * DRIVE_MULTIPLIER, rAxis * DRIVE_MULTIPLIER);
+
+        if (controller.getRawButton(CONTROLLER_RIGHT_TRIGGER)){
             Robot.driveBaseShifter.set(HIGH_GEAR);
-        } else if (left.getRawButton(6) || left.getRawButton(7) || right.getRawButton(6) || right.getRawButton(7)){
+        }
+        else if (controller.getRawButton(CONTROLLER_LEFT_TRIGGER)){
             Robot.driveBaseShifter.set(LOW_GEAR);
         }
     }
