@@ -13,6 +13,9 @@ public class TT_MainAuto {
 
     private static final double BASELINE_DISTANCE = 2.3;
 
+    private static final double MIDDLE_GEAR_DISTANCE = 1.7272;
+    private static final double MIDDLE_BACKUP_DISTANCE = 1;
+
     public static int currentReturnVal = 1;
     public static int currentMethodNum = 0;
 
@@ -40,6 +43,21 @@ public class TT_MainAuto {
 
             case 2:
                 //middle gear auto here
+                if (currentReturnVal == 0){
+                    currentMethodNum++;
+                }
+
+                if (currentMethodNum < 1){
+                    currentReturnVal = TT_Util.driveStraight(baseDrive, baseShifter, lEncoder, rEncoder, MIDDLE_GEAR_DISTANCE);
+                }else if (currentMethodNum < 2){
+                    currentReturnVal = TT_Util.driveStraight(baseDrive, baseShifter, lEncoder, rEncoder, MIDDLE_BACKUP_DISTANCE);
+                    pivotMotor.set(-0.2);
+                    claw.set(DoubleSolenoid.Value.kReverse);
+                } else {
+                    pivotMotor.set(0);
+                    baseDrive.tankDrive(0, 0);
+                    claw.set(DoubleSolenoid.Value.kForward);
+                }
                 break;
 
             case 3:
