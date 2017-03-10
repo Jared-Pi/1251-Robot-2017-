@@ -13,8 +13,9 @@ public class TT_MainAuto {
 
     private static final double BASELINE_DISTANCE = 2.3;
 
-    static int currentReturnVal = 1;
-    static int currentMethodNum = 0;
+    public static int currentReturnVal = 1;
+    public static int currentMethodNum = 0;
+
     public static void auto(int autoSelect, RobotDrive baseDrive, DoubleSolenoid baseShifter, SpeedController pivotMotor, DoubleSolenoid claw, Gyro gyro, Encoder lEncoder, Encoder rEncoder) {
         switch(autoSelect){
             case -1:
@@ -32,21 +33,18 @@ public class TT_MainAuto {
                     baseDrive.tankDrive(0, 0);
                 }
                 break;
+
             case 1:
                 // left gear auto here
                 break;
+
+            case 2:
+                //middle gear auto here
+                break;
+
             case 3:
-                if (gyro.getAngle() < -10.5){
-                    baseDrive.tankDrive(-0.4, 0.4);
-                } else if (gyro.getAngle() < -1){
-                    baseDrive.tankDrive(-0.3, 0.3);
-                } else if (gyro.getAngle() > 10.5){
-                    baseDrive.tankDrive(0.4, -0.4);
-                } else if (gyro.getAngle() > 1){
-                    baseDrive.tankDrive(0.3, -0.3);
-                } else {
-                    baseDrive.tankDrive(0, 0);
-                }
+                // right gear auto here
+                break;
 
         }
     }
