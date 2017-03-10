@@ -11,17 +11,29 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
  */
 public class TT_MainAuto {
 
+    private static final double BASELINE_DISTANCE = 2.3;
+
+    static int currentReturnVal = 1;
+    static int currentMethodNum = 0;
     public static void auto(int autoSelect, RobotDrive baseDrive, DoubleSolenoid baseShifter, SpeedController pivotMotor, DoubleSolenoid claw, Gyro gyro, Encoder lEncoder, Encoder rEncoder) {
         switch(autoSelect){
             case -1:
                 baseDrive.tankDrive(0, 0);
                 break;
 
-            case 1:
-
+            case 0:
+                //Baseline breaking auto
+                if (currentReturnVal == 0){
+                    currentMethodNum++;
+                }
+                if (currentMethodNum < 1) {
+                    currentReturnVal = TT_Util.driveStraight(baseDrive, baseShifter, lEncoder, rEncoder, BASELINE_DISTANCE);
+                } else {
+                    baseDrive.tankDrive(0, 0);
+                }
                 break;
-            case 2:
-                claw.set(DoubleSolenoid.Value.kReverse);
+            case 1:
+                // left gear auto here
                 break;
             case 3:
                 if (gyro.getAngle() < -10.5){
