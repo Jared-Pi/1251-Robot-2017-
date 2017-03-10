@@ -1,9 +1,9 @@
 package org.usfirst.frc.team1251;
 
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 /**
  * Created by Jared on 2/10/2017.
@@ -44,7 +44,7 @@ public class TT_Util {
     }
 
     // return 1 if still driving, return 0 if done
-    public static int driveStraight(RobotDrive baseDrive, DoubleSolenoid baseShifter, Encoder lEncoder, Encoder rEncoder, double distance){
+    public static int driveForward(RobotDrive baseDrive, DoubleSolenoid baseShifter, Encoder lEncoder, Encoder rEncoder, double distance) {
         if (firstDrive){
             lEncoder.reset();
             rEncoder.reset();
@@ -76,6 +76,36 @@ public class TT_Util {
         }
     }
 
+    // return 1 if still driving, return 0 if done
+    public static int driveBackward(RobotDrive baseDrive, DoubleSolenoid baseShifter, Encoder lEncoder, Encoder rEncoder, double distance) {
+        if (firstDrive) {
+            lEncoder.reset();
+            rEncoder.reset();
+            firstDrive = false;
+        }
+
+        if (lEncoder.getRate() < 1.2) {
+            lDriveSpeed += 0.01;
+        } else if (lEncoder.getRate() > 1.3) {
+            lDriveSpeed -= 0.01;
+        }
+
+        if (rEncoder.getRate() < 1.2) {
+            rDriveSpeed += 0.01;
+        } else if (rEncoder.getRate() > 1.3) {
+            rDriveSpeed -= 0.01;
+        }
+
+        baseShifter.set(DoubleSolenoid.Value.kReverse);
+        if (lEncoder.getDistance() >= -distance && lEncoder.getDistance() >= -distance) {
+            baseDrive.tankDrive(lDriveSpeed, rDriveSpeed);
+            return 1;
+        } else {
+            firstDrive = true;
+            return 0;
+        }
+    }
+
     /**
      *
      * @param rotation rotation of bot from current state
@@ -83,7 +113,7 @@ public class TT_Util {
      * @param gyro
      * @return
      */
-    public static int rotateBot(double rotation, RobotDrive baseDrive, ADXRS450_Gyro gyro){
+    public static int rotateBot(double rotation, RobotDrive baseDrive, Gyro gyro) {
         if (firstRotate){
             startAngle = gyro.getAngle();
             endAngle = gyro.getAngle() + rotation;
