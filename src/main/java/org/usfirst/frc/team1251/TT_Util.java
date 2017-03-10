@@ -76,15 +76,22 @@ public class TT_Util {
         }
     }
 
-    public static int rotateBot(double angle, RobotDrive baseDrive, ADXRS450_Gyro gyro){
+    /**
+     *
+     * @param rotation rotation of bot from current state
+     * @param baseDrive
+     * @param gyro
+     * @return
+     */
+    public static int rotateBot(double rotation, RobotDrive baseDrive, ADXRS450_Gyro gyro){
         if (firstRotate){
             startAngle = gyro.getAngle();
-            endAngle = gyro.getAngle() + angle;
+            endAngle = gyro.getAngle() + rotation;
             firstRotate = false;
         }
 
-        lRotateSpeed = -(Math.abs(gyro.getAngle() - endAngle) * (1.0 / angle)); // get difference between now and end and multiply by 1/ total degrees to travel
-        rRotateSpeed = Math.abs(gyro.getAngle() - endAngle) * (1.0 / angle);
+        lRotateSpeed = -(Math.abs(gyro.getAngle() - endAngle) * (1.0 / rotation)); // get difference between now and end and multiply by 1/ total degrees to travel
+        rRotateSpeed = Math.abs(gyro.getAngle() - endAngle) * (1.0 / rotation);
 
         if (!(Math.abs(gyro.getAngle()) < Math.abs(endAngle) + 1 && Math.abs(gyro.getAngle()) > Math.abs(endAngle) - 1)) {
             baseDrive.tankDrive(lRotateSpeed, rRotateSpeed);
