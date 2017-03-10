@@ -151,16 +151,20 @@ public class Robot extends IterativeRobot {
 
         gyro = new ADXRS450_Gyro();
         gyro.calibrate();
+        SmartDashboard.putNumber("Auto", -1);
 
     }
 
     @Override
     public void autonomousInit() {
         driveEncoderRight.setReverseDirection(true);
-        driveEncoderRight.setDistancePerPulse(0.00050779561);
-        driveEncoderLeft.setDistancePerPulse(0.00050779561);
+        driveEncoderRight.setDistancePerPulse(0.0005142918);
+        driveEncoderLeft.setDistancePerPulse(0.0005142918);
+        driveEncoderLeft.reset();
+        driveEncoderRight.reset();
         autoSelect = (int) SmartDashboard.getNumber("Auto", -1);
-        SmartDashboard.putString("Autos", "1: Go past baseline\n2: Middle Gear");
+        SmartDashboard.putString("Autos", "1: Go past baseline\n2: Middle Gear\n3:Stay straight");
+
     }
 
     @Override
@@ -170,6 +174,7 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putNumber("auto left enc", driveEncoderLeft.getDistance());
         SmartDashboard.putNumber("auto right enc", driveEncoderRight.getDistance());
         SmartDashboard.putNumber("Gyro", gyro.getAngle());
+        //autoSelect = (int) SmartDashboard.getNumber("Auto", -1);
     }
 
     @Override

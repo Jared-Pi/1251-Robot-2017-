@@ -48,6 +48,18 @@ public class TT_MainAuto {
             case 2:
                 claw.set(DoubleSolenoid.Value.kReverse);
                 break;
+            case 3:
+                if (gyro.getAngle() < -10.5){
+                    baseDrive.tankDrive(-0.4, 0.4);
+                } else if (gyro.getAngle() < -1){
+                    baseDrive.tankDrive(-0.3, 0.3);
+                } else if (gyro.getAngle() > 10.5){
+                    baseDrive.tankDrive(0.4, -0.4);
+                } else if (gyro.getAngle() > 1){
+                    baseDrive.tankDrive(0.3, -0.3);
+                } else {
+                    baseDrive.tankDrive(0, 0);
+                }
 
         }
     }
