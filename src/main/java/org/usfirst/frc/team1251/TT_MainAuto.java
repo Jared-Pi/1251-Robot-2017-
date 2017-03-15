@@ -23,12 +23,15 @@ public class TT_MainAuto {
     private static final double RIGHT_GEAR_DISTANCE = 1.70434;
     private static final double RIGHT_GEAR_BACKUP = 0.6096;
 
-    private static final double MIDDLE_GEAR_DISTANCE = 1.7272;
+    private static final double MIDDLE_GEAR_DISTANCE = 1.9;
     private static final double MIDDLE_BACKUP_DISTANCE = 1;
 
     public static int currentReturnVal = 1;
     public static int currentMethodNum = 0;
 
+    public static void autoInit(){
+        currentMethodNum = 0;
+    }
     public static void auto(int autoSelect, RobotDrive baseDrive, DoubleSolenoid baseShifter, SpeedController pivotMotor, DoubleSolenoid claw, Gyro gyro, Encoder lEncoder, Encoder rEncoder) {
         switch(autoSelect){
             case -1:
@@ -84,10 +87,39 @@ public class TT_MainAuto {
                 if (currentMethodNum < 1){
                     currentReturnVal = TT_Util.driveForward(baseDrive, baseShifter, lEncoder, rEncoder, MIDDLE_GEAR_DISTANCE);
                 }else if (currentMethodNum < 2){
-                    currentReturnVal = TT_Util.driveBackward(baseDrive, baseShifter, lEncoder, rEncoder, MIDDLE_BACKUP_DISTANCE);
-                    pivotMotor.set(-0.2);
+                    currentReturnVal = TT_Util.pause(25);
+                } else if (currentMethodNum < 3){
+                    currentReturnVal = TT_Util.pause(25);
                     claw.set(DoubleSolenoid.Value.kReverse);
-                } else {
+                    pivotMotor.set(-0.2);
+                } else if (currentMethodNum < 4){
+                    currentReturnVal = TT_Util.driveBackward(baseDrive, baseShifter, lEncoder, rEncoder, MIDDLE_BACKUP_DISTANCE);
+                }
+                else {
+                    pivotMotor.set(0);
+                    baseDrive.tankDrive(0, 0);
+                    claw.set(DoubleSolenoid.Value.kForward);
+                }
+                break;
+
+            case 4:
+                //middle gear auto here
+                if (currentReturnVal == 0){
+                    currentMethodNum++;
+                }
+
+                if (currentMethodNum < 1){
+                    currentReturnVal = TT_Util.driveForward(baseDrive, baseShifter, lEncoder, rEncoder, MIDDLE_GEAR_DISTANCE+1.2);
+                }else if (currentMethodNum < 2){
+                    currentReturnVal = TT_Util.pause(25);
+                } else if (currentMethodNum < 3){
+                    currentReturnVal = TT_Util.pause(25);
+                    claw.set(DoubleSolenoid.Value.kReverse);
+                    pivotMotor.set(-0.2);
+                } else if (currentMethodNum < 4){
+                    currentReturnVal = TT_Util.driveBackward(baseDrive, baseShifter, lEncoder, rEncoder, MIDDLE_BACKUP_DISTANCE-0.75);
+                }
+                else {
                     pivotMotor.set(0);
                     baseDrive.tankDrive(0, 0);
                     claw.set(DoubleSolenoid.Value.kForward);

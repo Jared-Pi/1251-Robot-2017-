@@ -14,11 +14,15 @@ public class TT_Util {
     static double rDriveSpeed = 0;
     static boolean firstDrive = true;
 
+    static boolean firstDriveBackward = true;
+
     static double lRotateSpeed = 0;
     static double rRotateSpeed = 0;
     static double startAngle = 0;
     static double endAngle = 0;
     static boolean firstRotate = true;
+
+    static int pauseCount = 0;
 
     public static double convertTicksToRPMsHanger(double speed){
         // divide by ticks per revolution
@@ -48,51 +52,56 @@ public class TT_Util {
         if (firstDrive){
             lEncoder.reset();
             rEncoder.reset();
+            lDriveSpeed = -0.5;
+            rDriveSpeed = -0.5;
             firstDrive = false;
         }
 
         if (lEncoder.getRate()<1.2) {
             lDriveSpeed -= 0.01;
         }
-        else if (lEncoder.getRate()>1.3) {
+        else if (lEncoder.getRate()>1.25) {
             lDriveSpeed += 0.01;
         }
 
         if (rEncoder.getRate()<1.2) {
             rDriveSpeed -= 0.01;
         }
-        else if (rEncoder.getRate()>1.3) {
+        else if (rEncoder.getRate()>1.25) {
             rDriveSpeed += 0.01;
         }
 
         baseShifter.set(DoubleSolenoid.Value.kReverse);
-        if (lEncoder.getDistance() <= distance && lEncoder.getDistance() <= distance) {
+        if (lEncoder.getDistance() < distance && lEncoder.getDistance() < distance) {
             baseDrive.tankDrive(lDriveSpeed, rDriveSpeed);
             return 1;
         }
         else {
             firstDrive = true;
+            baseDrive.tankDrive(0, 0);
             return 0;
         }
     }
 
     // return 1 if still driving, return 0 if done
     public static int driveBackward(RobotDrive baseDrive, DoubleSolenoid baseShifter, Encoder lEncoder, Encoder rEncoder, double distance) {
-        if (firstDrive) {
+        if (firstDriveBackward) {
             lEncoder.reset();
             rEncoder.reset();
-            firstDrive = false;
+            lDriveSpeed = 0.5;
+            rDriveSpeed = 0.5;
+            firstDriveBackward = false;
         }
 
-        if (lEncoder.getRate() < 1.2) {
+        if (lEncoder.getRate() > -1.2) {
             lDriveSpeed += 0.01;
-        } else if (lEncoder.getRate() > 1.3) {
+        } else if (lEncoder.getRate() < -1.3) {
             lDriveSpeed -= 0.01;
         }
 
-        if (rEncoder.getRate() < 1.2) {
+        if (rEncoder.getRate() > -1.2) {
             rDriveSpeed += 0.01;
-        } else if (rEncoder.getRate() > 1.3) {
+        } else if (rEncoder.getRate() < -1.3) {
             rDriveSpeed -= 0.01;
         }
 
@@ -101,7 +110,8 @@ public class TT_Util {
             baseDrive.tankDrive(lDriveSpeed, rDriveSpeed);
             return 1;
         } else {
-            firstDrive = true;
+            firstDriveBackward = true;
+            baseDrive.tankDrive(0, 0);
             return 0;
         }
     }
@@ -131,6 +141,16 @@ public class TT_Util {
             return 0;
         }
 
+    }
+
+    public static int pause(int loops){
+        if (pauseCount < loops){
+            pauseCount++;
+            return 1;
+        } else {
+            pauseCount = 0;
+            return 0;
+        }
     }
 
 }

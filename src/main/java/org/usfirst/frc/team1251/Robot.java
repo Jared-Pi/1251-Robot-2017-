@@ -164,6 +164,7 @@ public class Robot extends IterativeRobot {
         driveEncoderRight.reset();
         autoSelect = (int) SmartDashboard.getNumber("Auto", -1);
         SmartDashboard.putString("Autos", "1: Go past baseline\n2: Middle Gear\n3:Stay straight");
+        TT_MainAuto.autoInit();
 
     }
 
