@@ -13,9 +13,9 @@ public class Robot extends IterativeRobot {
 
     //Define Joystick inputs
     public static final int CONTROLLER_LEFT_AXIS = 1;
-    public static final int CONTROLLER_RIGHT_AXIS  = 3;
-    public static final int CONTROLLER_X_BUTTON  = 1;
-    public static final int CONTROLLER_A_BUTTON  = 2;
+    public static final int CONTROLLER_RIGHT_AXIS = 3;
+    public static final int CONTROLLER_X_BUTTON = 1;
+    public static final int CONTROLLER_A_BUTTON = 2;
     public static final int CONTROLLER_B_BUTTON = 3;
     public static final int CONTROLLER_Y_BUTTON = 4;
     public static final int CONTROLLER_LEFT_BUMPER = 5;
@@ -68,52 +68,43 @@ public class Robot extends IterativeRobot {
     private static final int DIO_PORT_6 = 6;
     private static final int DIO_PORT_7 = 7;
     private static final String GRIP_TABLE_NAME = "GRIP";
-
+    //Define Speed controllers
+    public static RobotDrive driveBase;
+    //Define Solenoids
+    public static DoubleSolenoid driveBaseShifter;
+    //Define encoder
+    public static Encoder driveEncoderLeft;
+    public static Encoder driveEncoderRight;
+    //Define booleans
+    public static boolean lockControls = false;
+    public static ADXRS450_Gyro gyro;
+    //Define PIDs
+    private final double drive_P = 0.00012;
+    private final double drive_I = 0.0004;
+    private final double drive_D = 0;
+    public int autoSelect;
     //Define Joystick ports
     private Joystick controller;
     private Joystick stick;
     private Joystick rightStick;
-
-    //Define Speed controllers
-    public static RobotDrive driveBase;
     private Talon shooter;
     private Talon agitator;
     private Talon ballCollector;
     private Talon gearCollector;
     private Talon hanger;
     private Talon gearPivot;
-
-    //Define Solenoids
-    public static DoubleSolenoid driveBaseShifter;
     private DoubleSolenoid ballCollectorPivot;
     private DoubleSolenoid gearClaw;
-
-
-    //Define encoder
-    public static Encoder driveEncoderLeft;
-    public static Encoder driveEncoderRight;
     private Encoder shooterEncoder;
     private Encoder hangLimit;
-
     //Define Sensors
     private Potentiometer gearPot;
-
-    //Define booleans
-    public static boolean lockControls = false;
-
     //Define network table grip communicator
     private TT_GRIP_Communicator gripCommunicator;
-
-    //Define PIDs
-    private final double shooter_P = 0;
-    private final double shooter_I = 0;
-    private final double shooter_D = 0;
-
-    private PIDController shooterPID;
-
-    public static ADXRS450_Gyro gyro;
-
-    public int autoSelect;
+    private PIDController leftDrive;
+    private PIDController rightDrive;
+    private TT_DoubleTalonPID leftDriveTalons;
+    private TT_DoubleTalonPID rightDriveTalons;
 
     @Override
     public void robotInit() {
@@ -123,13 +114,22 @@ public class Robot extends IterativeRobot {
         rightStick = new Joystick(2);
 
         //Declare Speed controllers
-        driveBase = new RobotDrive(PWM_PORT_0, PWM_PORT_1, PWM_PORT_2, PWM_PORT_3);
+        Talon leftTalon1 = new Talon(PWM_PORT_0);
+        Talon leftTalon2 = new Talon(PWM_PORT_1);
+        Talon rightTalon1 = new Talon(PWM_PORT_2);
+        Talon rightTalon2 = new Talon(PWM_PORT_3);
+
+        leftDriveTalons = new TT_DoubleTalonPID(leftTalon1, leftTalon2, true);
+        rightDriveTalons = new TT_DoubleTalonPID(rightTalon1, rightTalon2, true);
+
         shooter = new Talon(PWM_PORT_8);
         agitator = new Talon(PWM_PORT_7);
         ballCollector = new Talon(PWM_PORT_6);
         gearCollector = new Talon(PWM_PORT_4);
         gearPivot = new Talon(PWM_PORT_5);
         hanger = new Talon(PWM_PORT_9);
+
+        driveBase = new RobotDrive(leftTalon1, leftTalon2, rightTalon1, rightTalon2);
 
         //Declare Solenoids
         driveBaseShifter = new DoubleSolenoid(PCM_PORT_0, PCM_PORT_1);
@@ -147,7 +147,16 @@ public class Robot extends IterativeRobot {
 
         gripCommunicator = new TT_GRIP_Communicator(NetworkTable.getTable(GRIP_TABLE_NAME));
 
-        shooterPID = new PIDController(shooter_P, shooter_I, shooter_D, shooterEncoder, shooter, 1);
+        // PIDs
+        driveEncoderLeft.setPIDSourceType(PIDSourceType.kRate);
+        driveEncoderRight.setPIDSourceType(PIDSourceType.kRate);
+
+        leftDrive = new PIDController(drive_P, drive_I, drive_D, driveEncoderLeft, leftDriveTalons, 0.01);
+        rightDrive = new PIDController(drive_P, drive_I, drive_D, driveEncoderRight, rightDriveTalons, 0.01);
+
+
+        leftDrive.enable();
+        rightDrive.enable();
 
         gyro = new ADXRS450_Gyro();
         gyro.calibrate();
@@ -157,6 +166,8 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void autonomousInit() {
+        //leftDrive.disable();
+        rightDrive.disable();
         driveEncoderRight.setReverseDirection(true);
         driveEncoderRight.setDistancePerPulse(0.0005142918);
         driveEncoderLeft.setDistancePerPulse(0.0005142918);
@@ -192,10 +203,9 @@ public class Robot extends IterativeRobot {
         //Subsystem 1, Drivebase
         TT_Drive.drive(controller, driveBase);
         //TT_Drive.shifter(driveEncoderLeft, driveEncoderRight, driveBaseShifter);
-       if (stick.getRawButton(CONTROLLER_SELECT_BUTTON) || stick.getRawButton(CONTROLLER_START_BUTTON)) {
+        if (stick.getRawButton(CONTROLLER_SELECT_BUTTON) || stick.getRawButton(CONTROLLER_START_BUTTON)) {
             TT_Hanger.hang(stick, hanger, hangLimit, gearPivot);
-        }
-        else {
+        } else {
             hanger.set(0);
             TT_GearCollector.collectGearFloor(stick, gearCollector, gearPivot, gearClaw, gearPot);
         }
@@ -205,4 +215,32 @@ public class Robot extends IterativeRobot {
 
         SmartDashboard.putNumber("Pot", gearPot.get());
     }
+
+    @Override
+    public void testInit() {
+        driveEncoderRight.setReverseDirection(true);
+        //driveEncoderRight.setDistancePerPulse(0.0005142918);
+        //driveEncoderLeft.setDistancePerPulse(0.0005142918);
+
+        driveEncoderLeft.reset();
+        driveEncoderRight.reset();
+
+        leftDrive.enable();
+        rightDrive.enable();
+
+        SmartDashboard.putData("PID", leftDrive);
+        SmartDashboard.putNumber("Encoder", driveEncoderLeft.getRate());
+    }
+
+    @Override
+    public void testPeriodic() {
+        if (controller.getRawButton(CONTROLLER_A_BUTTON)) {
+            leftDrive.setSetpoint(TT_Util.convertRPMsToTicks(100));
+        } else {
+            leftDrive.setSetpoint(0);
+        }
+        SmartDashboard.putData("PID", leftDrive);
+        SmartDashboard.putNumber("Encoder", TT_Util.convertTicksToRPMs(driveEncoderLeft.getRate()));
+    }
+
 }

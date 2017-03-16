@@ -12,14 +12,23 @@ public class TT_DoubleTalonPID implements PIDOutput {
     private Talon talon1;
     private Talon talon2;
 
-    public TT_DoubleTalonPID(Talon talon1, Talon talon2) {
+    private boolean inverted = false;
+
+    public TT_DoubleTalonPID(Talon talon1, Talon talon2, boolean inverted) {
         this.talon1 = talon1;
         this.talon2 = talon2;
+        this.inverted = true;
     }
 
     @Override
     public void pidWrite(double output) {
-        talon1.set(output);
-        talon2.set(output);
+        if (inverted) {
+            talon1.set(-output);
+            talon2.set(-output);
+        } else {
+            talon1.set(output);
+            talon2.set(output);
+        }
+
     }
 }
