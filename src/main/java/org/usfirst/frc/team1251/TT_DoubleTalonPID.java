@@ -17,7 +17,7 @@ public class TT_DoubleTalonPID implements PIDOutput {
     public TT_DoubleTalonPID(Talon talon1, Talon talon2, boolean inverted) {
         this.talon1 = talon1;
         this.talon2 = talon2;
-        this.inverted = true;
+        this.inverted = inverted;
     }
 
     @Override
@@ -31,4 +31,9 @@ public class TT_DoubleTalonPID implements PIDOutput {
         }
 
     }
+
+    public double get() {
+        return talon1.get();
+    }
+
 }

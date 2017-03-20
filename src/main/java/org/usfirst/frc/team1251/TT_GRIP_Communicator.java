@@ -25,7 +25,7 @@ public class TT_GRIP_Communicator {
 
     public double[] getXFromTable(String tableName) {
         double[] value;
-        value = gripTable.getSubTable(tableName).getNumberArray("x", defaultValues);
+        value = gripTable.getSubTable(tableName).getNumberArray("centerX", defaultValues);
         return value;
     }
 

@@ -79,10 +79,17 @@ public class Robot extends IterativeRobot {
     public static boolean lockControls = false;
     public static ADXRS450_Gyro gyro;
     //Define PIDs
-    private final double drive_P = 0.00012;
-    private final double drive_I = 0.0004;
-    private final double drive_D = 0;
+    private final double drive_P = 0.00003;
+    //private final double drive_P = 0.0000001;
+    private final double drive_I = 0.00000000;
+    //private final double drive_I =  0.00000000095;
+    private final double drive_D = 0.00001;
+    //private final double drive_D = 0.0001;
+    //private final double drive_F = 0.00002988505 * 8;
+    private final double drive_F = 0;
     public int autoSelect;
+    double lsetpoint = TT_Util.convertRPMsToTicks(100);
+    double rsetpoint = TT_Util.convertRPMsToTicks(20);
     //Define Joystick ports
     private Joystick controller;
     private Joystick stick;
@@ -105,6 +112,7 @@ public class Robot extends IterativeRobot {
     private PIDController rightDrive;
     private TT_DoubleTalonPID leftDriveTalons;
     private TT_DoubleTalonPID rightDriveTalons;
+    private TT_GearTracker gearTracker = new TT_GearTracker();
 
     @Override
     public void robotInit() {
@@ -120,7 +128,7 @@ public class Robot extends IterativeRobot {
         Talon rightTalon2 = new Talon(PWM_PORT_3);
 
         leftDriveTalons = new TT_DoubleTalonPID(leftTalon1, leftTalon2, true);
-        rightDriveTalons = new TT_DoubleTalonPID(rightTalon1, rightTalon2, true);
+        rightDriveTalons = new TT_DoubleTalonPID(rightTalon1, rightTalon2, false);
 
         shooter = new Talon(PWM_PORT_8);
         agitator = new Talon(PWM_PORT_7);
@@ -137,8 +145,10 @@ public class Robot extends IterativeRobot {
         gearClaw = new DoubleSolenoid(PCM_PORT_2, PCM_PORT_3);
 
         //Declare encoder
-        driveEncoderLeft = new Encoder(DIO_PORT_0, DIO_PORT_1);
-        driveEncoderRight = new Encoder(DIO_PORT_2, DIO_PORT_3);
+        driveEncoderLeft = new Encoder(DIO_PORT_0, DIO_PORT_1, false, CounterBase.EncodingType.k1X);
+        driveEncoderRight = new Encoder(DIO_PORT_2, DIO_PORT_3, false, CounterBase.EncodingType.k1X);
+
+
         shooterEncoder = new Encoder(DIO_PORT_6, DIO_PORT_7);
         hangLimit = new Encoder(DIO_PORT_4, DIO_PORT_5);
 
@@ -151,12 +161,14 @@ public class Robot extends IterativeRobot {
         driveEncoderLeft.setPIDSourceType(PIDSourceType.kRate);
         driveEncoderRight.setPIDSourceType(PIDSourceType.kRate);
 
-        leftDrive = new PIDController(drive_P, drive_I, drive_D, driveEncoderLeft, leftDriveTalons, 0.01);
-        rightDrive = new PIDController(drive_P, drive_I, drive_D, driveEncoderRight, rightDriveTalons, 0.01);
+        driveEncoderLeft.setSamplesToAverage(20);
+        driveEncoderRight.setSamplesToAverage(20);
 
+        leftDrive = new PIDController(drive_P, drive_I, drive_D, drive_F, driveEncoderLeft, leftDriveTalons);
+        rightDrive = new PIDController(drive_P - 0.000005, drive_I, drive_D, drive_F, driveEncoderRight, rightDriveTalons);
 
-        leftDrive.enable();
-        rightDrive.enable();
+        //leftDrive.enable();
+        //rightDrive.enable();
 
         gyro = new ADXRS450_Gyro();
         gyro.calibrate();
@@ -167,7 +179,7 @@ public class Robot extends IterativeRobot {
     @Override
     public void autonomousInit() {
         //leftDrive.disable();
-        rightDrive.disable();
+        //rightDrive.disable();
         driveEncoderRight.setReverseDirection(true);
         driveEncoderRight.setDistancePerPulse(0.0005142918);
         driveEncoderLeft.setDistancePerPulse(0.0005142918);
@@ -210,12 +222,33 @@ public class Robot extends IterativeRobot {
             TT_GearCollector.collectGearFloor(stick, gearCollector, gearPivot, gearClaw, gearPot);
         }
 
-        SmartDashboard.putNumber("Left encoder rate", driveEncoderLeft.getRate());
+        SmartDashboard.putNumber("Left encoder rate", TT_Util.convertTicksToRPMs(driveEncoderLeft.getRate()));
         SmartDashboard.putNumber("Right encoder rate", driveEncoderRight.getRate());
+        SmartDashboard.putNumber("Left motor power", leftDriveTalons.get());
 
         SmartDashboard.putNumber("Pot", gearPot.get());
     }
 
+    @Override
+    public void testInit() {
+        leftDrive.disable();
+        rightDrive.disable();
+    }
+
+    @Override
+    public void testPeriodic() {
+        if (controller.getRawButton(CONTROLLER_A_BUTTON)) {
+            SmartDashboard.putBoolean("tracking", gearTracker.track(gripCommunicator));
+            driveBase.tankDrive(gearTracker.getLeftTurning(), gearTracker.getRightTurning());
+
+        } else {
+            driveBase.tankDrive(0, 0);
+        }
+        SmartDashboard.putNumber("drive left", gearTracker.getLeftTurning());
+        SmartDashboard.putNumber("drive right", gearTracker.getRightTurning());
+
+    }
+/* right gear auto
     @Override
     public void testInit() {
         driveEncoderRight.setReverseDirection(true);
@@ -230,17 +263,66 @@ public class Robot extends IterativeRobot {
 
         SmartDashboard.putData("PID", leftDrive);
         SmartDashboard.putNumber("Encoder", driveEncoderLeft.getRate());
+        lsetpoint = TT_Util.convertRPMsToTicks(100);
+        rsetpoint = TT_Util.convertRPMsToTicks(20);
     }
 
     @Override
     public void testPeriodic() {
         if (controller.getRawButton(CONTROLLER_A_BUTTON)) {
-            leftDrive.setSetpoint(TT_Util.convertRPMsToTicks(100));
+            leftDrive.setSetpoint(lsetpoint);
+            rightDrive.setSetpoint(rsetpoint);
+            leftDrive.enable();
+            rightDrive.enable();
         } else {
             leftDrive.setSetpoint(0);
+            rightDrive.setSetpoint(0);
+            leftDrive.disable();
+            rightDrive.disable();
         }
         SmartDashboard.putData("PID", leftDrive);
         SmartDashboard.putNumber("Encoder", TT_Util.convertTicksToRPMs(driveEncoderLeft.getRate()));
-    }
+        SmartDashboard.putNumber("right", TT_Util.convertTicksToRPMs(driveEncoderRight.getRate()));
+        if (driveEncoderLeft.get() * 0.0005142918 > 0.28 && driveEncoderRight.get() * 0.0005142918 < 0.1){
+            lsetpoint = TT_Util.convertRPMsToTicks(200);
+            rsetpoint = TT_Util.convertRPMsToTicks(200);
+        }
+        if (driveEncoderLeft.get() * 0.0005142918 > 2.5 && driveEncoderRight.get() * 0.0005142918 > 2.5){
+            lsetpoint = 0;
+            rsetpoint = 0;
+        }
+
+        SmartDashboard.putNumber("Left", leftDriveTalons.get());
+        SmartDashboard.putNumber("Right", rightDriveTalons.get());
+
+    }*/
+
+/* Middle gear
+
+double setpoint = TT_Util.convertRPMsToTicks(200);
+    @Override
+    public void testPeriodic() {
+        if (controller.getRawButton(CONTROLLER_A_BUTTON)) {
+            leftDrive.setSetpoint(setpoint);
+            rightDrive.setSetpoint(setpoint);
+            leftDrive.enable();
+            rightDrive.enable();
+        } else {
+            leftDrive.setSetpoint(0);
+            rightDrive.setSetpoint(0);
+            leftDrive.disable();
+            rightDrive.disable();
+        }
+        SmartDashboard.putData("PID", leftDrive);
+        SmartDashboard.putNumber("Encoder", TT_Util.convertTicksToRPMs(driveEncoderLeft.getRate()));
+        SmartDashboard.putNumber("right", TT_Util.convertTicksToRPMs(driveEncoderRight.getRate()));
+        if (driveEncoderLeft.get() * 0.0005142918 > 2.0 && driveEncoderRight.get() * 0.0005142918 > 1.8){
+            setpoint = 0;
+        }
+
+        SmartDashboard.putNumber("Left", leftDriveTalons.get());
+        SmartDashboard.putNumber("Right", rightDriveTalons.get());
+
+    }*/
 
 }
