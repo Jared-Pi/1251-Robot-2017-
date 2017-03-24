@@ -2,12 +2,14 @@ package org.usfirst.frc.team1251;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import static java.lang.Double.NaN;
+
 /**
  * Created by Eric Engelhart on 3/19/2017.
  */
 public class TT_GearTracker {
-    int cameraMiddleX = 320;
-    int pixelError = 5;
+    int cameraMiddleX = 314;
+    int pixelError = 2;
     double leftTurning;
     double rightTurning;
     public TT_GearTracker(){
@@ -18,7 +20,7 @@ public class TT_GearTracker {
 
         double[] gears = grip.getAreaFromTable("Gear");
         double[] Xs = grip.getXFromTable("Gear");
-        if (gears.length > 0) {
+        if (gears[0] != NaN) {
             SmartDashboard.putBoolean("getting table values", true);
             int bigGearIndex = 0;
             double bigGear = gears[0];
@@ -31,26 +33,34 @@ public class TT_GearTracker {
             double gearX = Xs[bigGearIndex];
             double multiplier = 1;
             if (Math.abs(gearX - cameraMiddleX) > pixelError) {
-                if (Math.abs(gearX - cameraMiddleX) < 100) {
-                    multiplier = 2.5;
+                if (Math.abs(gearX - cameraMiddleX) > 75) {
+                    multiplier = 0.9;
                 }
                 if (Math.abs(gearX - cameraMiddleX) < 50) {
-                    multiplier = 3.2;
+                    multiplier = 1.14 + 0.004666 * Math.abs(gearX - cameraMiddleX);
+                }
+
+                if (gearX - cameraMiddleX < 0) {
+                    leftTurning = Math.sqrt(-(gearX - cameraMiddleX) / cameraMiddleX) * multiplier;
+                    rightTurning = -Math.sqrt(-(gearX - cameraMiddleX) / cameraMiddleX) * multiplier;
+                } else if (gearX - cameraMiddleX > 0) {
+                    leftTurning = -Math.sqrt(((gearX - cameraMiddleX) / cameraMiddleX)) * multiplier;
+                    rightTurning = Math.sqrt((gearX - cameraMiddleX) / cameraMiddleX) * multiplier;
+
                 }
                 if (Math.abs(gearX - cameraMiddleX) < 20) {
-                    multiplier = 4;
+                    if (gearX - cameraMiddleX < 0) {
+                        leftTurning = 0.39;
+                        rightTurning = -0.38;
+                    } else if (gearX - cameraMiddleX > 0) {
+                        leftTurning = -0.39;
+                        rightTurning = 0.38;
+
+                    }
                 }
-                if (Math.abs(gearX - cameraMiddleX) < 15) {
-                    multiplier = 5;
-                }
-                if (gearX - cameraMiddleX < 0) {
-                    leftTurning = -((gearX - cameraMiddleX) / cameraMiddleX) * 0.8 * multiplier;
-                    rightTurning = ((gearX - cameraMiddleX) / cameraMiddleX) * 0.8 * multiplier;
-                } else if (gearX - cameraMiddleX > 0) {
-                    leftTurning = -((gearX - cameraMiddleX) / cameraMiddleX) * 0.8 * multiplier;
-                    rightTurning = ((gearX - cameraMiddleX) / cameraMiddleX) * 0.8 * multiplier;
-                }
+                SmartDashboard.putNumber("Error", Math.abs(gearX - cameraMiddleX));
             } else if (Math.abs(gearX - cameraMiddleX) < pixelError) {
+                SmartDashboard.putNumber("Error", Math.abs(gearX - cameraMiddleX));
                 return true;
             }
             return false;

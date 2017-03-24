@@ -2,6 +2,8 @@ package org.usfirst.frc.team1251;
 
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
+import static java.lang.Double.NaN;
+
 /**
  * Created by Eric Engelhart on 2/11/2017.
  */
@@ -13,7 +15,8 @@ public class TT_GRIP_Communicator {
 
     public TT_GRIP_Communicator(NetworkTable gripTable){
         this.gripTable = gripTable;
-        defaultValues = new double[0];
+        defaultValues = new double[1];
+        defaultValues[0] = NaN;
         INSTANCE = this;
     }
 
