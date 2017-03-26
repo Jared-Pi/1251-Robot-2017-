@@ -32,4 +32,10 @@ public class TT_GRIP_Communicator {
         return value;
     }
 
+    public double[] getYFromTable(String tableName) {
+        double[] value;
+        value = gripTable.getSubTable(tableName).getNumberArray("centerY", defaultValues);
+        return value;
+    }
+
 }

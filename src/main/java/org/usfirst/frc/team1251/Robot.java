@@ -184,8 +184,9 @@ public class Robot extends IterativeRobot {
 
         UsbCamera camera = new UsbCamera("xd", 0);
         camera.setFPS(60);
-        camera.setResolution(528, 396);
+        camera.setResolution(640, 480);
         CameraServer.getInstance().startAutomaticCapture(camera);
+        new TT_DriveUtil(leftDrive, rightDrive, gyro, driveEncoderLeft, driveEncoderRight, driveBase);
     }
 
     @Override
@@ -394,6 +395,8 @@ public class Robot extends IterativeRobot {
         driveEncoderRight.reset();
         methodNum = 1;
         methodDone = 1;
+        leftDrive.setSetpoint(0);
+        rightDrive.setSetpoint(0);
     }
 
 
@@ -402,10 +405,23 @@ public class Robot extends IterativeRobot {
         if (methodDone == 0) {
             methodNum++;
         }
+        // remove all button A code
         if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 2) {
-            methodDone = TT_DriveUtil.INSTANCE.driveStraight(200, 1.85);
-        } else {
+            methodDone = TT_DriveUtil.INSTANCE.driveStraight(350, 75);
 
+        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 3) {
+            methodDone = TT_Util.pause(15);
+        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 4) {
+            methodDone = TT_DriveUtil.INSTANCE.driveBackwards(450, 48);
+        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 5) {
+            methodDone = TT_DriveUtil.INSTANCE.turnRobot(300, 24);
+        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 6) {
+            methodDone = TT_DriveUtil.INSTANCE.trackGear();
+        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 7) {
+            methodDone = TT_DriveUtil.INSTANCE.forwardTrackGear();
+        } else {
+            methodDone = 1;
+            driveBase.tankDrive(0, 0);
         }
         SmartDashboard.putData("PID", leftDrive);
         SmartDashboard.putNumber("Encoder", TT_Util.convertTicksToRPMs(driveEncoderLeft.getRate()));

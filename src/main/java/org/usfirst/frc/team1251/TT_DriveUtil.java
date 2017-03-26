@@ -30,31 +30,125 @@ public class TT_DriveUtil {
     }
 
     // return 1 if still driving, return 0 if done
-    public int driveStraight(double RPM, double distanceMeters) {
+    public int driveStraight(double RPM, double distanceInches) {
         if (firstRun) {
+            resetPIDs();
             leftPID.enable();
             rightPID.enable();
-            rightEnc.reset();
-            leftEnc.reset();
             leftPID.setSetpoint(TT_Util.convertRPMsToTicks(RPM));
             rightPID.setSetpoint(TT_Util.convertRPMsToTicks(RPM));
             firstRun = false;
         }
 
-        if (((rightEnc.get() * 0.000521716447110 > distanceMeters && leftEnc.get() * 0.000521716447110 > distanceMeters) && (counter == 0)) || (counter > 0 && counter < 5)) {
+        if (((rightEnc.get() * 0.000521716447110 > TT_Util.inchesToMeters(distanceInches) && leftEnc.get() * 0.000521716447110 > TT_Util.inchesToMeters(distanceInches)) && (counter == 0)) || (counter > 0 && counter < 9)) {
             leftPID.disable();
             rightPID.disable();
-            driveBase.tankDrive(0.8, 0.8);
+            driveBase.tankDrive(0.7, 0.7);
             counter++;
         }
-        if (counter > 4) {
+        if (counter > 8) {
             driveBase.tankDrive(0, 0);
             firstRun = true;
             counter = 0;
-            rightEnc.reset();
-            leftEnc.reset();
+            resetPIDs();
             return 0;
         }
         return 1;
+    }
+
+    // return 1 if still driving, return 0 if done
+    public int driveBackwards(double RPM, double distanceInches) {
+        if (firstRun) {
+            resetPIDs();
+            leftPID.enable();
+            rightPID.enable();
+            leftPID.setSetpoint(-TT_Util.convertRPMsToTicks(RPM));
+            rightPID.setSetpoint(-TT_Util.convertRPMsToTicks(RPM));
+            firstRun = false;
+        }
+
+        if (((rightEnc.get() * 0.000521716447110 < -TT_Util.inchesToMeters(distanceInches) && leftEnc.get() * 0.000521716447110 < -TT_Util.inchesToMeters(distanceInches)) && (counter == 0)) || (counter > 0 && counter < 9)) {
+            leftPID.disable();
+            rightPID.disable();
+            driveBase.tankDrive(-0.7, -0.7);
+            counter++;
+        }
+        if (counter > 8) {
+            driveBase.tankDrive(0, 0);
+            firstRun = true;
+            counter = 0;
+            resetPIDs();
+            return 0;
+        }
+        return 1;
+    }
+
+    public int turnRobot(double randomRPM, double randomInches) {
+        if (firstRun) {
+            resetPIDs();
+            leftPID.enable();
+            rightPID.enable();
+            leftPID.setSetpoint(-TT_Util.convertRPMsToTicks(randomRPM));
+            rightPID.setSetpoint(TT_Util.convertRPMsToTicks(randomRPM));
+            firstRun = false;
+        }
+        if (rightEnc.get() * 0.000521716447110 > TT_Util.inchesToMeters(randomInches) && leftEnc.get() * 0.000521716447110 < -TT_Util.inchesToMeters(randomInches)) {
+            leftPID.disable();
+            rightPID.disable();
+            driveBase.tankDrive(0, 0);
+            firstRun = true;
+            resetPIDs();
+            return 0;
+        }
+        return 1;
+    }
+
+    public int trackGear() {
+        if (firstRun) {
+            resetPIDs();
+            leftPID.enable();
+            rightPID.enable();
+            firstRun = false;
+        }
+        boolean done = TT_GearTracker.INSTANCE.track(TT_GRIP_Communicator.INSTANCE);
+        leftPID.setSetpoint(TT_Util.convertRPMsToTicks(TT_GearTracker.INSTANCE.getLeftTurning()));
+        rightPID.setSetpoint(TT_Util.convertRPMsToTicks(TT_GearTracker.INSTANCE.getRightTurning()));
+        if (done) {
+            leftPID.disable();
+            rightPID.disable();
+            resetPIDs();
+            firstRun = true;
+            return 0;
+        }
+        return 1;
+    }
+
+    public int forwardTrackGear() {
+        if (firstRun) {
+            resetPIDs();
+            leftPID.enable();
+            rightPID.enable();
+            firstRun = false;
+        }
+        int done = TT_GearTracker.INSTANCE.driveForward(TT_GRIP_Communicator.INSTANCE);
+        leftPID.setSetpoint(TT_Util.convertRPMsToTicks(TT_GearTracker.INSTANCE.getLeftTurning()));
+        rightPID.setSetpoint(TT_Util.convertRPMsToTicks(TT_GearTracker.INSTANCE.getRightTurning()));
+        if (done == 0) {
+            leftPID.disable();
+            rightPID.disable();
+            resetPIDs();
+            firstRun = true;
+        }
+        return done;
+    }
+
+
+    public void resetPIDs() {
+        leftPID.setSetpoint(0);
+        rightPID.setSetpoint(0);
+        leftPID.reset();
+        rightPID.reset();
+        rightEnc.reset();
+        leftEnc.reset();
     }
 }

@@ -153,4 +153,8 @@ public class TT_Util {
         }
     }
 
+    public static double inchesToMeters(double inches) {
+        return inches * 0.02539999983236;
+    }
+
 }
