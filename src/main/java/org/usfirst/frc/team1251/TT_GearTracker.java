@@ -8,19 +8,21 @@ import static java.lang.Double.NaN;
  * Created by Eric Engelhart on 3/19/2017.
  */
 public class TT_GearTracker {
-    int cameraMiddleX = 314;
+    int cameraMiddleX = 264;
     int pixelError = 2;
     double leftTurning;
     double rightTurning;
+    double gearX;
     public TT_GearTracker(){
 
     }
 
     public boolean track(TT_GRIP_Communicator grip) {
-
+        leftTurning = 0;
+        rightTurning = 0;
         double[] gears = grip.getAreaFromTable("Gear");
         double[] Xs = grip.getXFromTable("Gear");
-        if (gears[0] != NaN) {
+        if (gears.length > 0 && Xs.length > 0 && gears[0] != NaN) {
             SmartDashboard.putBoolean("getting table values", true);
             int bigGearIndex = 0;
             double bigGear = gears[0];
@@ -30,37 +32,21 @@ public class TT_GearTracker {
                     bigGearIndex = i;
                 }
             }
-            double gearX = Xs[bigGearIndex];
-            double multiplier = 1;
-            if (Math.abs(gearX - cameraMiddleX) > pixelError) {
-                if (Math.abs(gearX - cameraMiddleX) > 75) {
-                    multiplier = 0.9;
+            gearX = Xs[bigGearIndex];
+            int error = (int) (gearX - cameraMiddleX);
+            if (Math.abs(error) > pixelError) {
+                if (error < 0) {  // need to turn left
+                    leftTurning = -(Math.log10(Math.abs(error)) + 1) * 10;
+                    rightTurning = (Math.log10(Math.abs(error)) + 1) * 10;
+                } else if (error > 0) { // need to turn right
+                    leftTurning = (Math.log10(error) + 1) * 10;
+                    rightTurning = -(Math.log10(error) + 1) * 10;
                 }
-                if (Math.abs(gearX - cameraMiddleX) < 50) {
-                    multiplier = 1.14 + 0.004666 * Math.abs(gearX - cameraMiddleX);
-                }
-
-                if (gearX - cameraMiddleX < 0) {
-                    leftTurning = Math.sqrt(-(gearX - cameraMiddleX) / cameraMiddleX) * multiplier;
-                    rightTurning = -Math.sqrt(-(gearX - cameraMiddleX) / cameraMiddleX) * multiplier;
-                } else if (gearX - cameraMiddleX > 0) {
-                    leftTurning = -Math.sqrt(((gearX - cameraMiddleX) / cameraMiddleX)) * multiplier;
-                    rightTurning = Math.sqrt((gearX - cameraMiddleX) / cameraMiddleX) * multiplier;
-
-                }
-                if (Math.abs(gearX - cameraMiddleX) < 20) {
-                    if (gearX - cameraMiddleX < 0) {
-                        leftTurning = 0.39;
-                        rightTurning = -0.38;
-                    } else if (gearX - cameraMiddleX > 0) {
-                        leftTurning = -0.39;
-                        rightTurning = 0.38;
-
-                    }
-                }
-                SmartDashboard.putNumber("Error", Math.abs(gearX - cameraMiddleX));
+                SmartDashboard.putNumber("Error", error);
             } else if (Math.abs(gearX - cameraMiddleX) < pixelError) {
-                SmartDashboard.putNumber("Error", Math.abs(gearX - cameraMiddleX));
+                SmartDashboard.putNumber("Error", error);
+                leftTurning = 0;
+                rightTurning = 0;
                 return true;
             }
             return false;

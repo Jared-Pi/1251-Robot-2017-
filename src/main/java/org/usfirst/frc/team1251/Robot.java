@@ -1,5 +1,6 @@
 package org.usfirst.frc.team1251;
 
+import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
@@ -90,6 +91,12 @@ public class Robot extends IterativeRobot {
     public int autoSelect;
     double lsetpoint = TT_Util.convertRPMsToTicks(100);
     double rsetpoint = TT_Util.convertRPMsToTicks(20);
+    boolean isTracked;
+    int trackingCounter = 0;
+    double setpoint = TT_Util.convertRPMsToTicks(200);
+    // Middle gear
+    int methodNum = 1;
+    int methodDone = 1;
     //Define Joystick ports
     private Joystick controller;
     private Joystick stick;
@@ -113,6 +120,7 @@ public class Robot extends IterativeRobot {
     private TT_DoubleTalonPID leftDriveTalons;
     private TT_DoubleTalonPID rightDriveTalons;
     private TT_GearTracker gearTracker = new TT_GearTracker();
+    private TT_GearPegTracker gearPegTracker = new TT_GearPegTracker();
 
     @Override
     public void robotInit() {
@@ -174,6 +182,10 @@ public class Robot extends IterativeRobot {
         gyro.calibrate();
         SmartDashboard.putNumber("Auto", -1);
 
+        UsbCamera camera = new UsbCamera("xd", 0);
+        camera.setFPS(60);
+        camera.setResolution(528, 396);
+        CameraServer.getInstance().startAutomaticCapture(camera);
     }
 
     @Override
@@ -200,54 +212,103 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putNumber("Gyro", gyro.getAngle());
         //autoSelect = (int) SmartDashboard.getNumber("Auto", -1);
     }
-
-    @Override
-    public void teleopInit() {
-        //this is due to reversed encoders in both bots
-        driveEncoderRight.setReverseDirection(true);
-        //it is 0.00050779561 meters per tick, as can be seen in the google sheets
-        driveEncoderRight.setDistancePerPulse(0.00050779561);
-        driveEncoderLeft.setDistancePerPulse(0.00050779561);
-    }
-
-    @Override
-    public void teleopPeriodic() {
-        //Subsystem 1, Drivebase
-        TT_Drive.drive(controller, driveBase);
-        //TT_Drive.shifter(driveEncoderLeft, driveEncoderRight, driveBaseShifter);
-        if (stick.getRawButton(CONTROLLER_SELECT_BUTTON) || stick.getRawButton(CONTROLLER_START_BUTTON)) {
-            TT_Hanger.hang(stick, hanger, hangLimit, gearPivot);
-        } else {
-            hanger.set(0);
-            TT_GearCollector.collectGearFloor(stick, gearCollector, gearPivot, gearClaw, gearPot);
-        }
-
-        SmartDashboard.putNumber("Left encoder rate", TT_Util.convertTicksToRPMs(driveEncoderLeft.getRate()));
-        SmartDashboard.putNumber("Right encoder rate", driveEncoderRight.getRate());
-        SmartDashboard.putNumber("Left motor power", leftDriveTalons.get());
-
-        SmartDashboard.putNumber("Pot", gearPot.get());
-    }
-
+/*
     @Override
     public void testInit() {
-        leftDrive.disable();
-        rightDrive.disable();
+        driveEncoderRight.setReverseDirection(true);
+        leftDrive.enable();
+        rightDrive.enable();
+        leftDrive.setSetpoint(0);
+        rightDrive.setSetpoint(0);
+
     }
 
     @Override
     public void testPeriodic() {
         if (controller.getRawButton(CONTROLLER_A_BUTTON)) {
-            SmartDashboard.putBoolean("tracking", gearTracker.track(gripCommunicator));
-            driveBase.tankDrive(gearTracker.getLeftTurning(), gearTracker.getRightTurning());
-
+            gearTracker.track(gripCommunicator);
+            leftDrive.setSetpoint(TT_Util.convertRPMsToTicks(gearTracker.getLeftTurning()));
+            rightDrive.setSetpoint(TT_Util.convertRPMsToTicks(gearTracker.getRightTurning()));
         } else {
-            driveBase.tankDrive(0, 0);
+            leftDrive.setSetpoint(0);
+            rightDrive.setSetpoint(0);
         }
+
+        SmartDashboard.putNumber("left Encoder", driveEncoderLeft.getRate());
+        SmartDashboard.putNumber("right Encoder", driveEncoderRight.getRate());
+
         SmartDashboard.putNumber("drive left", gearTracker.getLeftTurning());
         SmartDashboard.putNumber("drive right", gearTracker.getRightTurning());
 
+        SmartDashboard.putNumber("left setpoint", leftDrive.getSetpoint());
+        SmartDashboard.putNumber("right setpoint", rightDrive.getSetpoint());
+
+    }*/
+
+    /*
+
+    @Override
+    public void testInit() {
+        leftDrive.disable();
+        rightDrive.disable();
+        driveEncoderRight.setReverseDirection(true);
+        trackingCounter = 0;
+        isTracked = false;
+        leftDrive.enable();
+        rightDrive.enable();
+
     }
+
+    @Override
+    public void testPeriodic() {
+        if (controller.getRawButton(CONTROLLER_A_BUTTON)) {
+            if (driveEncoderLeft.get() * 0.0005142918 < 1){
+                leftDrive.setSetpoint(TT_Util.convertRPMsToTicks(150));
+                rightDrive.setSetpoint(TT_Util.convertRPMsToTicks(150));
+            }else {
+
+                isTracked = gearPegTracker.track(gripCommunicator) || isTracked;
+                if (!isTracked) {
+                    trackingCounter = 0;
+                }
+                if (isTracked && trackingCounter < 50) {
+                    trackingCounter++;
+                    isTracked = false;
+                }
+                SmartDashboard.putBoolean("is tracked", isTracked);
+                if (!isTracked) {
+
+                    SmartDashboard.putBoolean("tracked", false);
+                    leftDrive.setSetpoint(TT_Util.convertRPMsToTicks(gearPegTracker.getLeftTurning() * 35));
+                    rightDrive.setSetpoint(TT_Util.convertRPMsToTicks(gearPegTracker.getRightTurning() * 35));
+
+                } else {
+                   /* SmartDashboard.putBoolean("tracked", true);
+                    if (driveEncoderLeft.get() * 0.0005142918 < 1.85) {
+                        leftDrive.setSetpoint(TT_Util.convertRPMsToTicks(150));
+                        rightDrive.setSetpoint(TT_Util.convertRPMsToTicks(150));
+                    } else {
+                        leftDrive.disable();
+                        rightDrive.disable();
+                    }
+                   leftDrive.disable();
+                   rightDrive.disable();
+
+}
+            }
+
+                    } else {
+                    driveBase.tankDrive(0, 0);
+                    }
+
+                    SmartDashboard.putNumber("left Encoder", driveEncoderLeft.getRate());
+                    SmartDashboard.putNumber("right Encoder", driveEncoderRight.getRate());
+
+                    SmartDashboard.putNumber("drive left", gearPegTracker.getLeftTurning());
+                    SmartDashboard.putNumber("drive right", gearPegTracker.getRightTurning());
+
+                    }
+     */
 /* right gear auto
     @Override
     public void testInit() {
@@ -297,32 +358,64 @@ public class Robot extends IterativeRobot {
 
     }*/
 
-/* Middle gear
+    @Override
+    public void teleopInit() {
+        //this is due to reversed encoders in both bots
+        driveEncoderRight.setReverseDirection(true);
+        //it is 0.00050779561 meters per tick, as can be seen in the google sheets
+        driveEncoderRight.setDistancePerPulse(1);
+        driveEncoderLeft.setDistancePerPulse(1);
+    }
 
-double setpoint = TT_Util.convertRPMsToTicks(200);
+    @Override
+    public void teleopPeriodic() {
+        //Subsystem 1, Drivebase
+        TT_Drive.drive(controller, driveBase);
+        //TT_Drive.shifter(driveEncoderLeft, driveEncoderRight, driveBaseShifter);
+        if (stick.getRawButton(CONTROLLER_SELECT_BUTTON) || stick.getRawButton(CONTROLLER_START_BUTTON)) {
+            TT_Hanger.hang(stick, hanger, hangLimit, gearPivot);
+        } else {
+            hanger.set(0);
+            TT_GearCollector.collectGearFloor(stick, gearCollector, gearPivot, gearClaw, gearPot);
+        }
+
+        SmartDashboard.putNumber("Left encoder rate", TT_Util.convertTicksToRPMs(driveEncoderLeft.getRate()));
+        SmartDashboard.putNumber("Right encoder rate", driveEncoderRight.getRate());
+        SmartDashboard.putNumber("Left motor power", leftDriveTalons.get());
+
+        SmartDashboard.putNumber("Pot", gearPot.get());
+    }
+
+    @Override
+    public void testInit() {
+        driveEncoderRight.setReverseDirection(true);
+        setpoint = TT_Util.convertRPMsToTicks(200);
+        driveEncoderLeft.reset();
+        driveEncoderRight.reset();
+        methodNum = 1;
+        methodDone = 1;
+    }
+
+
     @Override
     public void testPeriodic() {
-        if (controller.getRawButton(CONTROLLER_A_BUTTON)) {
-            leftDrive.setSetpoint(setpoint);
-            rightDrive.setSetpoint(setpoint);
-            leftDrive.enable();
-            rightDrive.enable();
+        if (methodDone == 0) {
+            methodNum++;
+        }
+        if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 2) {
+            methodDone = TT_DriveUtil.INSTANCE.driveStraight(200, 1.85);
         } else {
-            leftDrive.setSetpoint(0);
-            rightDrive.setSetpoint(0);
-            leftDrive.disable();
-            rightDrive.disable();
+
         }
         SmartDashboard.putData("PID", leftDrive);
         SmartDashboard.putNumber("Encoder", TT_Util.convertTicksToRPMs(driveEncoderLeft.getRate()));
         SmartDashboard.putNumber("right", TT_Util.convertTicksToRPMs(driveEncoderRight.getRate()));
-        if (driveEncoderLeft.get() * 0.0005142918 > 2.0 && driveEncoderRight.get() * 0.0005142918 > 1.8){
-            setpoint = 0;
-        }
+
 
         SmartDashboard.putNumber("Left", leftDriveTalons.get());
         SmartDashboard.putNumber("Right", rightDriveTalons.get());
+        SmartDashboard.putNumber("Right Encoder Val", driveEncoderRight.get());
 
-    }*/
+    }
 
 }

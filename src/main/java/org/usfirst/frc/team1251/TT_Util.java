@@ -41,8 +41,8 @@ public class TT_Util {
     }
     public static double convertRPMsToTicks(double speed){
         // multiply by ticks per revolution
-        speed *= 550;
-        // multiply by seconds per minute
+        speed *= 552.6666666;
+        // divide by seconds per minute
         speed /= 60;
         return  speed;
     }
