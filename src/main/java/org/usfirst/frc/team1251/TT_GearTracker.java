@@ -9,7 +9,7 @@ import static java.lang.Double.NaN;
  */
 public class TT_GearTracker {
     public static TT_GearTracker INSTANCE;
-    final double VIEWING_LIMIT_Y = 440;
+    final double VIEWING_LIMIT_Y = 410;
     int cameraMiddleX = 320;
     int pixelError = 2;
     double leftTurning;
@@ -79,8 +79,8 @@ public class TT_GearTracker {
             }
             gearY = Ys[bigGearIndex];
             if (gearY < VIEWING_LIMIT_Y) {
-                rightTurning = (Math.log10(VIEWING_LIMIT_Y - gearY) + 1) * 50;
-                leftTurning = (Math.log10(VIEWING_LIMIT_Y - gearY) + 1) * 50;
+                rightTurning = ((Math.log10(VIEWING_LIMIT_Y - gearY) + 1) * 50) + 50;
+                leftTurning = ((Math.log10(VIEWING_LIMIT_Y - gearY) + 1) * 50) + 50;
 
             } else {
                 leftTurning = 0;

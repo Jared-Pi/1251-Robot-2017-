@@ -92,7 +92,7 @@ public class TT_DriveUtil {
             rightPID.setSetpoint(TT_Util.convertRPMsToTicks(randomRPM));
             firstRun = false;
         }
-        if (rightEnc.get() * 0.000521716447110 > TT_Util.inchesToMeters(randomInches) && leftEnc.get() * 0.000521716447110 < -TT_Util.inchesToMeters(randomInches)) {
+        if (Math.abs(rightEnc.get()) * 0.000521716447110 > TT_Util.inchesToMeters(randomInches) && Math.abs(leftEnc.get()) * 0.000521716447110 > TT_Util.inchesToMeters(randomInches)) {
             leftPID.disable();
             rightPID.disable();
             driveBase.tankDrive(0, 0);
@@ -102,6 +102,7 @@ public class TT_DriveUtil {
         }
         return 1;
     }
+
 
     public int trackGear() {
         if (firstRun) {
@@ -150,5 +151,26 @@ public class TT_DriveUtil {
         rightPID.reset();
         rightEnc.reset();
         leftEnc.reset();
+    }
+
+    public int trackPeg(int error) {
+        if (firstRun) {
+            resetPIDs();
+            leftPID.enable();
+            rightPID.enable();
+            firstRun = false;
+        }
+        boolean tracked = TT_GearPegTracker.INSTANCE.track(TT_GRIP_Communicator.INSTANCE, error);
+        leftPID.setSetpoint(TT_GearPegTracker.INSTANCE.getLeftTurning());
+        rightPID.setSetpoint(TT_GearPegTracker.INSTANCE.getRightTurning());
+        if (tracked) {
+            leftPID.disable();
+            rightPID.disable();
+            resetPIDs();
+            firstRun = true;
+            return 0;
+        }
+
+        return 1;
     }
 }
