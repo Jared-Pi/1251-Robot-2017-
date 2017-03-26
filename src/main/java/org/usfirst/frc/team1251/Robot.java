@@ -420,19 +420,19 @@ public class Robot extends IterativeRobot {
         } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 7) {
             methodDone = TT_DriveUtil.INSTANCE.forwardTrackGear();
         } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 8) {
-            methodDone = TT_DriveUtil.INSTANCE.driveStraight(100, 10);
+            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(100, 10);
         } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 9) {
-            methodDone = TT_DriveUtil.INSTANCE.driveBackwards(450, 14);
+            methodDone = TT_DriveUtil.INSTANCE.driveBackwards(450, 20);
         } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 10) {
-            methodDone = TT_DriveUtil.INSTANCE.turnRobot(-250, 33.5);
+            methodDone = TT_DriveUtil.INSTANCE.turnRobot(-250, 30);
         } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 11) {
-            methodDone = TT_DriveUtil.INSTANCE.trackPeg(10);
+            methodDone = TT_DriveUtil.INSTANCE.trackPeg(8);
         } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 12) {
-            methodDone = TT_DriveUtil.INSTANCE.driveStraight(350, 35);
+            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(350, 48);
         } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 13) {
-            methodDone = TT_DriveUtil.INSTANCE.trackPeg(3);
+            methodDone = 0;//TT_DriveUtil.INSTANCE.trackPeg(3);
         } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 14) {
-            methodDone = TT_DriveUtil.INSTANCE.driveStraight(350, 12);
+            methodDone = 0; //TT_DriveUtil.INSTANCE.driveStraightAndCoast(350, 15);
         } else {
             methodDone = 1;
             driveBase.tankDrive(0, 0);

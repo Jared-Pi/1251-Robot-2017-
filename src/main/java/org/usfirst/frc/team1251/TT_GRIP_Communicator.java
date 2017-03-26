@@ -38,4 +38,16 @@ public class TT_GRIP_Communicator {
         return value;
     }
 
+    public double[] getWidthFromTable(String tableName) {
+        double[] value;
+        value = gripTable.getSubTable(tableName).getNumberArray("width", defaultValues);
+        return value;
+    }
+
+    public double[] getHeightFromTable(String tableName) {
+        double[] value;
+        value = gripTable.getSubTable(tableName).getNumberArray("height", defaultValues);
+        return value;
+    }
+
 }

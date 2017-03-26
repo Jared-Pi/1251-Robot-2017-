@@ -57,6 +57,28 @@ public class TT_DriveUtil {
     }
 
     // return 1 if still driving, return 0 if done
+    public int driveStraightAndCoast(double RPM, double distanceInches) {
+        if (firstRun) {
+            resetPIDs();
+            leftPID.enable();
+            rightPID.enable();
+            leftPID.setSetpoint(TT_Util.convertRPMsToTicks(RPM));
+            rightPID.setSetpoint(TT_Util.convertRPMsToTicks(RPM));
+            firstRun = false;
+        }
+
+        if (rightEnc.get() * 0.000521716447110 > TT_Util.inchesToMeters(distanceInches) && leftEnc.get() * 0.000521716447110 > TT_Util.inchesToMeters(distanceInches)) {
+            leftPID.disable();
+            rightPID.disable();
+            firstRun = true;
+            counter = 0;
+            resetPIDs();
+            return 0;
+        }
+        return 1;
+    }
+
+    // return 1 if still driving, return 0 if done
     public int driveBackwards(double RPM, double distanceInches) {
         if (firstRun) {
             resetPIDs();

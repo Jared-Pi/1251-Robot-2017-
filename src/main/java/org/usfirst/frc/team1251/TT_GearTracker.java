@@ -9,9 +9,9 @@ import static java.lang.Double.NaN;
  */
 public class TT_GearTracker {
     public static TT_GearTracker INSTANCE;
-    final double VIEWING_LIMIT_Y = 410;
+    final double VIEWING_LIMIT_Y = 400;
     int cameraMiddleX = 320;
-    int pixelError = 2;
+    int pixelError = 6;
     double leftTurning;
     double rightTurning;
     double gearX;
@@ -41,11 +41,11 @@ public class TT_GearTracker {
             int error = (int) (gearX - cameraMiddleX);
             if (Math.abs(error) > pixelError) {
                 if (error < 0) {  // need to turn left
-                    leftTurning = -Math.pow((Math.log10(Math.abs(error)) + 1), 2) * 10;
-                    rightTurning = Math.pow((Math.log10(Math.abs(error)) + 1), 2) * 10;
+                    leftTurning = -Math.pow((Math.log10(Math.abs(error)) + 1), 2) * 7;
+                    rightTurning = Math.pow((Math.log10(Math.abs(error)) + 1), 2) * 7;
                 } else if (error > 0) { // need to turn right
-                    leftTurning = Math.pow((Math.log10(error) + 1), 2) * 10;
-                    rightTurning = -Math.pow((Math.log10(error) + 1), 2) * 10;
+                    leftTurning = Math.pow((Math.log10(error) + 1), 2) * 7;
+                    rightTurning = -Math.pow((Math.log10(error) + 1), 2) * 7;
                 }
                 SmartDashboard.putNumber("Error", error);
             } else if (Math.abs(gearX - cameraMiddleX) < pixelError) {
