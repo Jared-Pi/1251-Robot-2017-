@@ -386,7 +386,7 @@ public class Robot extends IterativeRobot {
 
         SmartDashboard.putNumber("Pot", gearPot.get());
     }
-
+/*
     @Override
     public void testInit() {
         driveEncoderRight.setReverseDirection(true);
@@ -447,5 +447,6 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putNumber("Right Encoder Val", driveEncoderRight.get());
 
     }
+    */
 
 }
