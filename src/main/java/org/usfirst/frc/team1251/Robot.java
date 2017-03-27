@@ -97,6 +97,7 @@ public class Robot extends IterativeRobot {
     // Middle gear
     int methodNum = 1;
     int methodDone = 1;
+    int counter = 0;
     //Define Joystick ports
     private Joystick controller;
     private Joystick stick;
@@ -202,16 +203,6 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putString("Autos", "1: Go past baseline\n2: Middle Gear\n3:Stay straight");
         TT_MainAuto.autoInit();
 
-    }
-
-    @Override
-    public void autonomousPeriodic() {
-        TT_MainAuto.auto(autoSelect, driveBase, driveBaseShifter, gearPivot, gearClaw, gyro, driveEncoderLeft, driveEncoderRight);
-
-        SmartDashboard.putNumber("auto left enc", driveEncoderLeft.getDistance());
-        SmartDashboard.putNumber("auto right enc", driveEncoderRight.getDistance());
-        SmartDashboard.putNumber("Gyro", gyro.getAngle());
-        //autoSelect = (int) SmartDashboard.getNumber("Auto", -1);
     }
 /*
     @Override
@@ -360,6 +351,16 @@ public class Robot extends IterativeRobot {
     }*/
 
     @Override
+    public void autonomousPeriodic() {
+        TT_MainAuto.auto(autoSelect, driveBase, driveBaseShifter, gearPivot, gearClaw, gyro, driveEncoderLeft, driveEncoderRight);
+
+        SmartDashboard.putNumber("auto left enc", driveEncoderLeft.getDistance());
+        SmartDashboard.putNumber("auto right enc", driveEncoderRight.getDistance());
+        SmartDashboard.putNumber("Gyro", gyro.getAngle());
+        //autoSelect = (int) SmartDashboard.getNumber("Auto", -1);
+    }
+
+    @Override
     public void teleopInit() {
         //this is due to reversed encoders in both bots
         driveEncoderRight.setReverseDirection(true);
@@ -367,26 +368,7 @@ public class Robot extends IterativeRobot {
         driveEncoderRight.setDistancePerPulse(1);
         driveEncoderLeft.setDistancePerPulse(1);
     }
-
-    @Override
-    public void teleopPeriodic() {
-        //Subsystem 1, Drivebase
-        TT_Drive.drive(controller, driveBase);
-        //TT_Drive.shifter(driveEncoderLeft, driveEncoderRight, driveBaseShifter);
-        if (stick.getRawButton(CONTROLLER_SELECT_BUTTON) || stick.getRawButton(CONTROLLER_START_BUTTON)) {
-            TT_Hanger.hang(stick, hanger, hangLimit, gearPivot);
-        } else {
-            hanger.set(0);
-            TT_GearCollector.collectGearFloor(stick, gearCollector, gearPivot, gearClaw, gearPot);
-        }
-
-        SmartDashboard.putNumber("Left encoder rate", TT_Util.convertTicksToRPMs(driveEncoderLeft.getRate()));
-        SmartDashboard.putNumber("Right encoder rate", driveEncoderRight.getRate());
-        SmartDashboard.putNumber("Left motor power", leftDriveTalons.get());
-
-        SmartDashboard.putNumber("Pot", gearPot.get());
-    }
-/*
+/* Center Gear (2 Gear auto)
     @Override
     public void testInit() {
         driveEncoderRight.setReverseDirection(true);
@@ -448,5 +430,90 @@ public class Robot extends IterativeRobot {
 
     }
     */
+
+// on right side, turn left, then go forwards
+
+    @Override
+    public void teleopPeriodic() {
+        //Subsystem 1, Drivebase
+        TT_Drive.drive(controller, driveBase);
+        //TT_Drive.shifter(driveEncoderLeft, driveEncoderRight, driveBaseShifter);
+        if (stick.getRawButton(CONTROLLER_SELECT_BUTTON) || stick.getRawButton(CONTROLLER_START_BUTTON)) {
+            TT_Hanger.hang(stick, hanger, hangLimit, gearPivot);
+        } else {
+            hanger.set(0);
+            TT_GearCollector.collectGearFloor(stick, gearCollector, gearPivot, gearClaw, gearPot);
+        }
+
+        SmartDashboard.putNumber("Left encoder rate", TT_Util.convertTicksToRPMs(driveEncoderLeft.getRate()));
+        SmartDashboard.putNumber("Right encoder rate", driveEncoderRight.getRate());
+        SmartDashboard.putNumber("Left motor power", leftDriveTalons.get());
+
+        SmartDashboard.putNumber("Pot", gearPot.get());
+    }
+
+    @Override
+    public void testInit() {
+        driveEncoderRight.setReverseDirection(true);
+        //driveEncoderRight.setDistancePerPulse(0.0005142918);
+        //driveEncoderLeft.setDistancePerPulse(0.0005142918);
+
+        driveEncoderLeft.reset();
+        driveEncoderRight.reset();
+
+        leftDrive.enable();
+        rightDrive.enable();
+
+        SmartDashboard.putData("PID", leftDrive);
+        SmartDashboard.putNumber("Encoder", driveEncoderLeft.getRate());
+
+        methodDone = 1;
+        methodNum = 0;
+        counter = 0;
+    }
+
+    @Override
+    public void testPeriodic() {
+        System.out.println("NUM" + methodNum);
+        if (methodDone == 0) {
+            methodNum++;
+        }
+        if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 1) {
+            methodDone = TT_DriveUtil.INSTANCE.forwardsTurn(20, 100, 30);
+        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 2) {
+            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(200, 70);
+        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 3) {
+            methodDone = TT_DriveUtil.INSTANCE.forwardsTurn(100, 20, 5);
+        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 4) {
+            counter++;
+            if (counter < 150) {
+                methodDone = TT_DriveUtil.INSTANCE.trackPeg(7);
+            } else {
+                leftDrive.disable();
+                rightDrive.disable();
+                TT_DriveUtil.INSTANCE.resetPIDs();
+                TT_DriveUtil.INSTANCE.firstRun = true;
+                counter = 0;
+                methodNum++;
+            }
+            System.out.println("COUNT" + counter);
+        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 5) {
+            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(200, 26);
+        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 6) {
+            methodDone = TT_Util.pause(30);
+        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 7) {
+            methodDone = TT_DriveUtil.INSTANCE.driveBackwards(200, 64);
+        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 8) {
+            methodDone = TT_DriveUtil.INSTANCE.turnRobot(-200, 14);
+        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 9) {
+            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(300, 180);
+        } else {
+            driveBase.tankDrive(0, 0);
+        }
+
+        SmartDashboard.putNumber("Left", leftDriveTalons.get());
+        SmartDashboard.putNumber("Right", rightDriveTalons.get());
+
+    }
 
 }

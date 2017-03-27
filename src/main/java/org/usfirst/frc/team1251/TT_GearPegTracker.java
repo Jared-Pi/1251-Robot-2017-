@@ -28,7 +28,7 @@ public class TT_GearPegTracker {
                 SmartDashboard.putBoolean("getting table values", true);
 
                 for (int i = 0; i < widths.length; i++) {
-                    System.out.println("THING" + i + ": " + heights[i] / widths[i]);
+                    //System.out.println("THING" + i + ": " + heights[i] / widths[i]);
                     if (heights[i] / widths[i] < 1.5 && heights[i] / widths[i] > 3) {
                         gearPegs[i] = -1;
                     }
@@ -66,6 +66,7 @@ public class TT_GearPegTracker {
                 double leftPegX = Xs[biggerI];
                 double rightPegX = Xs[biggestI];
                 double pegX = (leftPegX + rightPegX) / 2;
+                SmartDashboard.putNumber("PEG X", pegX);
                 int error = (int) (pegX - cameraMiddleX);
                 if (Math.abs(error) > pixelError) {
                     if (error < 0) {  // need to turn left

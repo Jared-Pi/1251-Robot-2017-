@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.RobotDrive;
  */
 public class TT_DriveUtil {
     public static TT_DriveUtil INSTANCE;
+    public static boolean firstRun = true;
     private PIDController leftPID;
     private PIDController rightPID;
     private ADXRS450_Gyro gryo;
@@ -17,7 +18,6 @@ public class TT_DriveUtil {
     private Encoder rightEnc;
     private RobotDrive driveBase;
     private int counter = 0;
-    private boolean firstRun = true;
 
     public TT_DriveUtil(PIDController leftPID, PIDController rightPID, ADXRS450_Gyro gryo, Encoder leftEnc, Encoder rightEnc, RobotDrive driveBase) {
         this.leftPID = leftPID;
@@ -73,6 +73,26 @@ public class TT_DriveUtil {
             firstRun = true;
             counter = 0;
             resetPIDs();
+            return 0;
+        }
+        return 1;
+    }
+
+    public int forwardsTurn(double lRPM, double rRPM, double distanceInches) {
+        if (firstRun) {
+            resetPIDs();
+            leftPID.enable();
+            rightPID.enable();
+            leftPID.setSetpoint(TT_Util.convertRPMsToTicks(lRPM));
+            rightPID.setSetpoint(TT_Util.convertRPMsToTicks(rRPM));
+            firstRun = false;
+        }
+
+        if (rightEnc.get() * 0.000521716447110 > TT_Util.inchesToMeters(distanceInches) || leftEnc.get() * 0.000521716447110 > TT_Util.inchesToMeters(distanceInches)) {
+            leftPID.disable();
+            rightPID.disable();
+            resetPIDs();
+            firstRun = true;
             return 0;
         }
         return 1;
