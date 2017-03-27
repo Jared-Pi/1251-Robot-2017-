@@ -504,7 +504,7 @@ public class Robot extends IterativeRobot {
         } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 7) {
             methodDone = TT_DriveUtil.INSTANCE.driveBackwards(200, 64);
         } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 8) {
-            methodDone = TT_DriveUtil.INSTANCE.turnRobot(-200, 14);
+            methodDone = TT_DriveUtil.INSTANCE.turnRobot(-200, 10);
         } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 9) {
             methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(300, 180);
         } else {
