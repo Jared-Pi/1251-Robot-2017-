@@ -79,6 +79,10 @@ public class Robot extends IterativeRobot {
     //Define booleans
     public static boolean lockControls = false;
     public static ADXRS450_Gyro gyro;
+    public static PIDController leftDrive;
+    public static PIDController rightDrive;
+    public static TT_DoubleTalonPID leftDriveTalons;
+    public static TT_DoubleTalonPID rightDriveTalons;
     //Define PIDs
     private final double drive_P = 0.00003;
     //private final double drive_P = 0.0000001;
@@ -116,10 +120,6 @@ public class Robot extends IterativeRobot {
     private Potentiometer gearPot;
     //Define network table grip communicator
     private TT_GRIP_Communicator gripCommunicator;
-    private PIDController leftDrive;
-    private PIDController rightDrive;
-    private TT_DoubleTalonPID leftDriveTalons;
-    private TT_DoubleTalonPID rightDriveTalons;
     private TT_GearTracker gearTracker = new TT_GearTracker();
     private TT_GearPegTracker gearPegTracker = new TT_GearPegTracker();
 
@@ -474,16 +474,15 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void testPeriodic() {
-        System.out.println("NUM" + methodNum);
         if (methodDone == 0) {
             methodNum++;
         }
         if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 1) {
-            methodDone = TT_DriveUtil.INSTANCE.forwardsTurn(20, 100, 30);
+            methodDone = TT_DriveUtil.INSTANCE.forwardsTurn(100, 20, 30);
         } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 2) {
-            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(200, 70);
+            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(300, 70);
         } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 3) {
-            methodDone = TT_DriveUtil.INSTANCE.forwardsTurn(100, 20, 5);
+            methodDone = TT_DriveUtil.INSTANCE.forwardsTurn(20, 100, 5);
         } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 4) {
             counter++;
             if (counter < 150) {
@@ -496,24 +495,29 @@ public class Robot extends IterativeRobot {
                 counter = 0;
                 methodNum++;
             }
-            System.out.println("COUNT" + counter);
         } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 5) {
-            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(200, 26);
+            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(200, 24);
         } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 6) {
             methodDone = TT_Util.pause(30);
         } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 7) {
-            methodDone = TT_DriveUtil.INSTANCE.driveBackwards(200, 64);
+            methodDone = TT_DriveUtil.INSTANCE.driveBackwards(200, 48);
         } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 8) {
-            methodDone = TT_DriveUtil.INSTANCE.turnRobot(-200, 10);
+            methodDone = TT_DriveUtil.INSTANCE.turnRobot(200, 10);
         } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 9) {
-            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(300, 180);
+            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(300, 120);
+        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 10) {
+            methodDone = TT_DriveUtil.INSTANCE.turnRobot(-200, 10);
+        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 11) {
+            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(300, 254);
         } else {
+            leftDrive.disable();
+            rightDrive.disable();
             driveBase.tankDrive(0, 0);
         }
 
         SmartDashboard.putNumber("Left", leftDriveTalons.get());
         SmartDashboard.putNumber("Right", rightDriveTalons.get());
-
     }
+
 
 }
