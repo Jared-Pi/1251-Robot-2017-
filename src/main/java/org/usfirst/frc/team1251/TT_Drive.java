@@ -18,11 +18,9 @@ public class TT_Drive {
     private static final int DRIVE_MULTIPLIER = 1;
     private static final double RPM_LIMIT = 3000.0;
     private static final int LOOPS_TO_SWITCH = 16;
-
+    private static final double DRIVE_MINIMUM = 0.15;
     private static int lowGearLoopTimer = 0;
     private static int highGearLoopTimer = 0;
-
-    private static final double DRIVE_MINIMUM = 0.15;
     private static double lAxis = 0;
     private static double rAxis = 0;
 
@@ -39,6 +37,11 @@ public class TT_Drive {
         }
         else {
             rAxis = controller.getRawAxis(CONTROLLER_RIGHT_AXIS)*abs(controller.getRawAxis(CONTROLLER_RIGHT_AXIS));
+        }
+
+        if (controller.getRawButton(CONTROLLER_LEFT_BUMPER) || controller.getRawButton(CONTROLLER_RIGHT_BUMPER)) {
+            lAxis *= 0.6;
+            rAxis *= 0.6;
         }
 
         base.tankDrive(lAxis * DRIVE_MULTIPLIER, rAxis * DRIVE_MULTIPLIER);

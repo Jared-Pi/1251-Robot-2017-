@@ -145,6 +145,7 @@ public class TT_Util {
 
     public static int pause(int loops){
         if (pauseCount < loops){
+            TT_DriveUtil.INSTANCE.resetPIDs();
             pauseCount++;
             return 1;
         } else {

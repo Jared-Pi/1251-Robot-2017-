@@ -1,16 +1,16 @@
 package org.usfirst.frc.team1251;
 
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.*;
 
 /**
  * Created by Eric Engelhart on 3/26/2017.
  */
 public class TT_DriveUtil {
+    private static final double metersPerTick = 0.000521716447110;
     public static TT_DriveUtil INSTANCE;
     public static boolean firstRun = true;
+    // return 1 if still driving, return 0 if done
+    boolean next;
     private PIDController leftPID;
     private PIDController rightPID;
     private ADXRS450_Gyro gryo;
@@ -29,7 +29,6 @@ public class TT_DriveUtil {
         INSTANCE = this;
     }
 
-    // return 1 if still driving, return 0 if done
     public int driveStraight(double RPM, double distanceInches) {
         if (firstRun) {
             resetPIDs();
@@ -38,19 +37,26 @@ public class TT_DriveUtil {
             leftPID.setSetpoint(TT_Util.convertRPMsToTicks(RPM));
             rightPID.setSetpoint(TT_Util.convertRPMsToTicks(RPM));
             firstRun = false;
+            System.out.println("forwards1");
         }
 
-        if (((rightEnc.get() * 0.000521716447110 > TT_Util.inchesToMeters(distanceInches) && leftEnc.get() * 0.000521716447110 > TT_Util.inchesToMeters(distanceInches)) && (counter == 0)) || (counter > 0 && counter < 9)) {
+        if ((rightEnc.get() * metersPerTick > TT_Util.inchesToMeters(distanceInches) && leftEnc.get() * metersPerTick > TT_Util.inchesToMeters(distanceInches))) {
+            next = true;
             leftPID.disable();
             rightPID.disable();
+        }
+        if (next && counter < 9) {
+            System.out.println("forwards2");
             driveBase.tankDrive(0.7, 0.7);
             counter++;
         }
         if (counter > 8) {
             driveBase.tankDrive(0, 0);
             firstRun = true;
+            next = false;
             counter = 0;
             resetPIDs();
+            System.out.println("forwards");
             return 0;
         }
         return 1;
@@ -67,7 +73,7 @@ public class TT_DriveUtil {
             firstRun = false;
         }
 
-        if (rightEnc.get() * 0.000521716447110 > TT_Util.inchesToMeters(distanceInches) && leftEnc.get() * 0.000521716447110 > TT_Util.inchesToMeters(distanceInches)) {
+        if (rightEnc.get() * metersPerTick > TT_Util.inchesToMeters(distanceInches) && leftEnc.get() * metersPerTick > TT_Util.inchesToMeters(distanceInches)) {
             leftPID.disable();
             rightPID.disable();
             firstRun = true;
@@ -88,7 +94,7 @@ public class TT_DriveUtil {
             firstRun = false;
         }
 
-        if (rightEnc.get() * 0.000521716447110 > TT_Util.inchesToMeters(distanceInches) || leftEnc.get() * 0.000521716447110 > TT_Util.inchesToMeters(distanceInches)) {
+        if (rightEnc.get() * metersPerTick > TT_Util.inchesToMeters(distanceInches) || leftEnc.get() * metersPerTick > TT_Util.inchesToMeters(distanceInches)) {
             leftPID.disable();
             rightPID.disable();
             resetPIDs();
@@ -109,9 +115,12 @@ public class TT_DriveUtil {
             firstRun = false;
         }
 
-        if (((rightEnc.get() * 0.000521716447110 < -TT_Util.inchesToMeters(distanceInches) && leftEnc.get() * 0.000521716447110 < -TT_Util.inchesToMeters(distanceInches)) && (counter == 0)) || (counter > 0 && counter < 9)) {
+        if (rightEnc.get() * metersPerTick < -TT_Util.inchesToMeters(distanceInches) && leftEnc.get() * metersPerTick < -TT_Util.inchesToMeters(distanceInches)) {
             leftPID.disable();
             rightPID.disable();
+            next = true;
+        }
+        if (next && counter < 9) {
             driveBase.tankDrive(-0.7, -0.7);
             counter++;
         }
@@ -134,7 +143,7 @@ public class TT_DriveUtil {
             rightPID.setSetpoint(TT_Util.convertRPMsToTicks(randomRPM));
             firstRun = false;
         }
-        if (Math.abs(rightEnc.get()) * 0.000521716447110 > TT_Util.inchesToMeters(randomInches) && Math.abs(leftEnc.get()) * 0.000521716447110 > TT_Util.inchesToMeters(randomInches)) {
+        if (Math.abs(rightEnc.get()) * metersPerTick > TT_Util.inchesToMeters(randomInches) && Math.abs(leftEnc.get()) * metersPerTick > TT_Util.inchesToMeters(randomInches)) {
             leftPID.disable();
             rightPID.disable();
             driveBase.tankDrive(0, 0);
@@ -214,5 +223,41 @@ public class TT_DriveUtil {
         }
 
         return 1;
+    }
+
+    public int dropGear() {
+        if (firstRun) {
+            firstRun = false;
+            counter = 0;
+        }
+        counter++;
+        if (counter < 25) {
+            Robot.gearClaw.set(DoubleSolenoid.Value.kReverse);
+            return 1;
+        }
+        if (counter < 50) {
+            Robot.gearPivot.set(-0.35);
+            return 1;
+        }
+        firstRun = true;
+        counter = 0;
+        return 0;
+    }
+
+    public int resetGearCollector() {
+        if (firstRun) {
+            firstRun = false;
+            counter = 0;
+        }
+        counter++;
+        if (counter < 50) {
+            Robot.gearClaw.set(DoubleSolenoid.Value.kForward);
+            Robot.gearPivot.set(0.35);
+            System.out.println("resetting");
+            return 1;
+        }
+        firstRun = true;
+        counter = 0;
+        return 0;
     }
 }

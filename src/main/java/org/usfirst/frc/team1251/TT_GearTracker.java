@@ -10,7 +10,7 @@ import static java.lang.Double.NaN;
 public class TT_GearTracker {
     public static TT_GearTracker INSTANCE;
     final double VIEWING_LIMIT_Y = 400;
-    int cameraMiddleX = 320;
+    int cameraMiddleX = 300;
     int pixelError = 6;
     double leftTurning;
     double rightTurning;

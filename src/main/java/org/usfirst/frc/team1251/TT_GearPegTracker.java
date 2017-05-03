@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class TT_GearPegTracker {
     public static TT_GearPegTracker INSTANCE;
     final int PEG_HIGHEST_Y = 205;
-    int cameraMiddleX = 320;
+    int cameraMiddleX = 300;
     double leftTurning;
     double rightTurning;
 
@@ -22,11 +22,11 @@ public class TT_GearPegTracker {
         double[] Ys = grip.getYFromTable("GearPeg");
         double[] widths = grip.getWidthFromTable("GearPeg");
         double[] heights = grip.getHeightFromTable("GearPeg");
+
         fucntion:
         {
             if (gearPegs.length > 1 && Xs.length > 1 && Ys.length > 1 && widths.length > 1 && heights.length > 1) {
                 SmartDashboard.putBoolean("getting table values", true);
-
                 for (int i = 0; i < widths.length; i++) {
                     //System.out.println("THING" + i + ": " + heights[i] / widths[i]);
                     if (heights[i] / widths[i] < 1.5 && heights[i] / widths[i] > 3) {
@@ -66,15 +66,16 @@ public class TT_GearPegTracker {
                 double leftPegX = Xs[biggerI];
                 double rightPegX = Xs[biggestI];
                 double pegX = (leftPegX + rightPegX) / 2;
+                System.out.println(pegX);
                 SmartDashboard.putNumber("PEG X", pegX);
                 int error = (int) (pegX - cameraMiddleX);
                 if (Math.abs(error) > pixelError) {
                     if (error < 0) {  // need to turn left
-                        leftTurning = -Math.pow((Math.log10(Math.abs(error)) + 1), 2) * 25;
-                        rightTurning = Math.pow((Math.log10(Math.abs(error)) + 1), 2) * 25;
+                        leftTurning = (-Math.pow((Math.log10(Math.abs(error)) + 1), 2) * 25) - 10;
+                        rightTurning = Math.pow((Math.log10(Math.abs(error)) + 1), 2) * 25 + 10;
                     } else if (error > 0) { // need to turn right
-                        leftTurning = Math.pow((Math.log10(error) + 1), 2) * 25;
-                        rightTurning = -Math.pow((Math.log10(error) + 1), 2) * 25;
+                        leftTurning = Math.pow((Math.log10(error) + 1), 2) * 25 + 10;
+                        rightTurning = -Math.pow((Math.log10(error) + 1), 2) * 25 - 10;
                     }
                     SmartDashboard.putNumber("Error", error);
                 } else if (Math.abs(pegX - cameraMiddleX) < pixelError) {

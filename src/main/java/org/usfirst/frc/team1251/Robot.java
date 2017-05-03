@@ -1,5 +1,6 @@
 package org.usfirst.frc.team1251;
 
+import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
@@ -83,6 +84,10 @@ public class Robot extends IterativeRobot {
     public static PIDController rightDrive;
     public static TT_DoubleTalonPID leftDriveTalons;
     public static TT_DoubleTalonPID rightDriveTalons;
+    //Define Joystick ports
+    public static Joystick controller;
+    public static Talon gearPivot;
+    public static DoubleSolenoid gearClaw;
     //Define PIDs
     private final double drive_P = 0.00003;
     //private final double drive_P = 0.0000001;
@@ -102,8 +107,11 @@ public class Robot extends IterativeRobot {
     int methodNum = 1;
     int methodDone = 1;
     int counter = 0;
-    //Define Joystick ports
-    private Joystick controller;
+    //Define network table grip communicator
+    //private TT_GRIP_Communicator gripCommunicator;
+    //private TT_GearTracker gearTracker = new TT_GearTracker();
+    //private TT_GearPegTracker gearPegTracker =
+    MjpegServer mjpegServer;
     private Joystick stick;
     private Joystick rightStick;
     private Talon shooter;
@@ -111,17 +119,11 @@ public class Robot extends IterativeRobot {
     private Talon ballCollector;
     private Talon gearCollector;
     private Talon hanger;
-    private Talon gearPivot;
     private DoubleSolenoid ballCollectorPivot;
-    private DoubleSolenoid gearClaw;
     private Encoder shooterEncoder;
     private Encoder hangLimit;
     //Define Sensors
     private Potentiometer gearPot;
-    //Define network table grip communicator
-    private TT_GRIP_Communicator gripCommunicator;
-    private TT_GearTracker gearTracker = new TT_GearTracker();
-    private TT_GearPegTracker gearPegTracker = new TT_GearPegTracker();
 
     @Override
     public void robotInit() {
@@ -164,7 +166,7 @@ public class Robot extends IterativeRobot {
         //Declare Sensors
         gearPot = new AnalogPotentiometer(0, 3600, 3);
 
-        gripCommunicator = new TT_GRIP_Communicator(NetworkTable.getTable(GRIP_TABLE_NAME));
+        new TT_GRIP_Communicator(NetworkTable.getTable(GRIP_TABLE_NAME));
 
         // PIDs
         driveEncoderLeft.setPIDSourceType(PIDSourceType.kRate);
@@ -174,7 +176,7 @@ public class Robot extends IterativeRobot {
         driveEncoderRight.setSamplesToAverage(20);
 
         leftDrive = new PIDController(drive_P, drive_I, drive_D, drive_F, driveEncoderLeft, leftDriveTalons);
-        rightDrive = new PIDController(drive_P - 0.000005, drive_I, drive_D, drive_F, driveEncoderRight, rightDriveTalons);
+        rightDrive = new PIDController(drive_P - 0.000006, drive_I, drive_D, drive_F, driveEncoderRight, rightDriveTalons);
 
         //leftDrive.enable();
         //rightDrive.enable();
@@ -183,11 +185,18 @@ public class Robot extends IterativeRobot {
         gyro.calibrate();
         SmartDashboard.putNumber("Auto", -1);
 
-        UsbCamera camera = new UsbCamera("xd", 0);
+        UsbCamera camera = new UsbCamera("cam", 0);
         camera.setFPS(60);
-        camera.setResolution(640, 480);
-        CameraServer.getInstance().startAutomaticCapture(camera);
+        camera.setResolution(600, 450);
+
+        //System.out.println(CameraServer.getInstance().addServer("cam", 5800).getSource().getName());
+        //CameraServer.getInstance().addCamera(camera);
+        mjpegServer = new MjpegServer("", 5800);
+        mjpegServer.setSource(camera);
+
         new TT_DriveUtil(leftDrive, rightDrive, gyro, driveEncoderLeft, driveEncoderRight, driveBase);
+        new TT_GearPegTracker();
+        new TT_GearTracker();
     }
 
     @Override
@@ -199,9 +208,10 @@ public class Robot extends IterativeRobot {
         driveEncoderLeft.setDistancePerPulse(0.0005142918);
         driveEncoderLeft.reset();
         driveEncoderRight.reset();
+        driveBaseShifter.set(DoubleSolenoid.Value.kReverse);
         autoSelect = (int) SmartDashboard.getNumber("Auto", -1);
         SmartDashboard.putString("Autos", "1: Go past baseline\n2: Middle Gear\n3:Stay straight");
-        TT_MainAuto.autoInit();
+        TT_MainAuto.autoInit(autoSelect);
 
     }
 /*
@@ -367,6 +377,7 @@ public class Robot extends IterativeRobot {
         //it is 0.00050779561 meters per tick, as can be seen in the google sheets
         driveEncoderRight.setDistancePerPulse(1);
         driveEncoderLeft.setDistancePerPulse(1);
+        //mjpegServer.free();
     }
 /* Center Gear (2 Gear auto)
     @Override
@@ -454,69 +465,12 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void testInit() {
-        driveEncoderRight.setReverseDirection(true);
-        //driveEncoderRight.setDistancePerPulse(0.0005142918);
-        //driveEncoderLeft.setDistancePerPulse(0.0005142918);
-
-        driveEncoderLeft.reset();
-        driveEncoderRight.reset();
-
-        leftDrive.enable();
-        rightDrive.enable();
-
-        SmartDashboard.putData("PID", leftDrive);
-        SmartDashboard.putNumber("Encoder", driveEncoderLeft.getRate());
-
-        methodDone = 1;
-        methodNum = 0;
-        counter = 0;
+        TT_Auto.twoGearAutoInit();
     }
 
     @Override
     public void testPeriodic() {
-        if (methodDone == 0) {
-            methodNum++;
-        }
-        if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 1) {
-            methodDone = TT_DriveUtil.INSTANCE.forwardsTurn(100, 20, 30);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 2) {
-            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(300, 70);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 3) {
-            methodDone = TT_DriveUtil.INSTANCE.forwardsTurn(20, 100, 5);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 4) {
-            counter++;
-            if (counter < 150) {
-                methodDone = TT_DriveUtil.INSTANCE.trackPeg(7);
-            } else {
-                leftDrive.disable();
-                rightDrive.disable();
-                TT_DriveUtil.INSTANCE.resetPIDs();
-                TT_DriveUtil.INSTANCE.firstRun = true;
-                counter = 0;
-                methodNum++;
-            }
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 5) {
-            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(200, 24);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 6) {
-            methodDone = TT_Util.pause(30);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 7) {
-            methodDone = TT_DriveUtil.INSTANCE.driveBackwards(200, 48);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 8) {
-            methodDone = TT_DriveUtil.INSTANCE.turnRobot(200, 10);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 9) {
-            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(300, 120);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 10) {
-            methodDone = TT_DriveUtil.INSTANCE.turnRobot(-200, 10);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 11) {
-            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(300, 254);
-        } else {
-            leftDrive.disable();
-            rightDrive.disable();
-            driveBase.tankDrive(0, 0);
-        }
-
-        SmartDashboard.putNumber("Left", leftDriveTalons.get());
-        SmartDashboard.putNumber("Right", rightDriveTalons.get());
+        TT_Auto.twoGearAutoPeriodic(controller);
     }
 
 

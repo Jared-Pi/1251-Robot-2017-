@@ -76,10 +76,75 @@ public class TT_Auto {
     }
 
     public static void twoGearAutoInit() {
+        driveEncoderRight.setReverseDirection(true);
+        //driveEncoderRight.setDistancePerPulse(0.0005142918);
+        //driveEncoderLeft.setDistancePerPulse(0.0005142918);
 
+        driveEncoderLeft.reset();
+        driveEncoderRight.reset();
+
+        Robot.leftDrive.enable();
+        Robot.rightDrive.enable();
+
+        SmartDashboard.putData("PID", Robot.leftDrive);
+        SmartDashboard.putNumber("Encoder", driveEncoderLeft.getRate());
+
+        methodDone = 1;
+        methodNum = 1;
+        counter = 0;
     }
 
-    public static void twoGearAutoPeriodic() {
+    public static void twoGearAutoPeriodic(Joystick controller) {
+        // remove all button A code
+        if (methodNum < 2) {
+            methodDone = TT_DriveUtil.INSTANCE.driveStraight(350, 75);
+        } else if (methodNum < 3) {
+            methodDone = TT_Util.pause(15);
+        } else if (methodNum < 4) {
+            methodDone = TT_DriveUtil.INSTANCE.driveBackwards(450, 48);
+        } else if (methodNum < 5) {
+            methodDone = TT_DriveUtil.INSTANCE.turnRobot(300, 24);
+        } else if (methodNum < 6) {
+            if (counter < 75) {
+                methodDone = TT_DriveUtil.INSTANCE.trackGear();
+            } else {
+                methodDone = 0;
+                counter = 0;
+            }
+            counter++;
+        } else if (methodNum < 7) {
+            methodDone = TT_DriveUtil.INSTANCE.forwardTrackGear();
+        } else if (methodNum < 8) {
+            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(100, 10);
+        } else if (methodNum < 9) {
+            methodDone = TT_DriveUtil.INSTANCE.driveBackwards(450, 20);
+        } else if (methodNum < 10) {
+            methodDone = TT_DriveUtil.INSTANCE.turnRobot(-250, 30);
+        } else if (methodNum < 11) {
+            methodDone = TT_DriveUtil.INSTANCE.trackPeg(7);
+        } else if (methodNum < 12) {
+            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(350, 48);
+        } else if (methodNum < 13) {
+            methodDone = 0;//TT_DriveUtil.INSTANCE.trackPeg(3);
+        } else if (methodNum < 14) {
+            methodDone = 0; //TT_DriveUtil.INSTANCE.driveStraightAndCoast(350, 15);
+        } else {
+            methodDone = 1;
+            driveBase.tankDrive(0, 0);
+        }
+        SmartDashboard.putData("PID", leftDrive);
+        SmartDashboard.putNumber("Encoder", TT_Util.convertTicksToRPMs(driveEncoderLeft.getRate()));
+        SmartDashboard.putNumber("right", TT_Util.convertTicksToRPMs(driveEncoderRight.getRate()));
+
+
+        SmartDashboard.putNumber("Left", leftDriveTalons.get());
+        SmartDashboard.putNumber("Right", rightDriveTalons.get());
+        SmartDashboard.putNumber("Right Encoder Val", driveEncoderRight.get());
+
+        if (methodDone == 0) {
+            methodNum++;
+            methodDone = 1;
+        }
 
     }
 
@@ -106,14 +171,16 @@ public class TT_Auto {
         if (methodDone == 0) {
             methodNum++;
         }
-        if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 1) {
-            methodDone = TT_DriveUtil.INSTANCE.forwardsTurn(20, 100, 30);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 2) {
+        if (methodNum < 1) {
+            methodDone = TT_DriveUtil.INSTANCE.driveStraight(200, 30);
+        } else if (methodNum < 2) {
+            methodDone = TT_DriveUtil.INSTANCE.forwardsTurn(20, 100, 43);
+        } else if (methodNum < 3) {
             methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(300, 70);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 3) {
-            methodDone = TT_DriveUtil.INSTANCE.forwardsTurn(100, 20, 5);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 4) {
-            counter++;
+        } else if (methodNum < 4) {
+            methodDone = TT_DriveUtil.INSTANCE.forwardsTurn(100, 20, 10);
+        } else if (methodNum < 5) {
+            /*counter++;
             if (counter < 150) {
                 methodDone = TT_DriveUtil.INSTANCE.trackPeg(7);
             } else {
@@ -123,16 +190,21 @@ public class TT_Auto {
                 TT_DriveUtil.INSTANCE.firstRun = true;
                 counter = 0;
                 methodNum++;
-            }
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 5) {
+            }*/
+            methodNum++;
+        } else if (methodNum < 6) {
             methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(200, 24);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 6) {
+        } else if (methodNum < 7) {
             methodDone = TT_Util.pause(30);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 7) {
+        } else if (methodNum < 8) {
+            methodDone = TT_DriveUtil.INSTANCE.dropGear();
+        } else if (methodNum < 9) {
             methodDone = TT_DriveUtil.INSTANCE.driveBackwards(200, 64);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 8) {
-            methodDone = TT_DriveUtil.INSTANCE.turnRobot(-200, 10);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 9) {
+        } else if (methodNum < 10) {
+            methodDone = TT_DriveUtil.INSTANCE.resetGearCollector();
+        } else if (methodNum < 11) {
+            methodDone = TT_DriveUtil.INSTANCE.turnRobot(-200, 16);
+        } else if (methodNum < 12) {
             methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(300, 180);
         } else {
             driveBase.tankDrive(0, 0);
@@ -165,14 +237,17 @@ public class TT_Auto {
         if (methodDone == 0) {
             methodNum++;
         }
-        if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 1) {
+
+        if (methodNum < 1) {
+            methodDone = TT_DriveUtil.INSTANCE.driveStraight(200, 30);
+        } else if (methodNum < 2) {
             methodDone = TT_DriveUtil.INSTANCE.forwardsTurn(20, 100, 30);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 2) {
+        } else if (methodNum < 3) {
             methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(300, 70);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 3) {
+        } else if (methodNum < 4) {
             methodDone = TT_DriveUtil.INSTANCE.forwardsTurn(100, 20, 5);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 4) {
-            counter++;
+        } else if (methodNum < 5) {
+            /*counter++;
             if (counter < 150) {
                 methodDone = TT_DriveUtil.INSTANCE.trackPeg(7);
             } else {
@@ -182,20 +257,25 @@ public class TT_Auto {
                 TT_DriveUtil.INSTANCE.firstRun = true;
                 counter = 0;
                 methodNum++;
-            }
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 5) {
+            }*/
+            methodNum++;
+        } else if (methodNum < 6) {
             methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(200, 24);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 6) {
+        } else if (methodNum < 7) {
             methodDone = TT_Util.pause(30);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 7) {
+        } else if (methodNum < 8) {
+            methodDone = TT_DriveUtil.INSTANCE.dropGear();
+        } else if (methodNum < 9) {
             methodDone = TT_DriveUtil.INSTANCE.driveBackwards(200, 64);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 8) {
+        } else if (methodNum < 10) {
+            methodDone = TT_DriveUtil.INSTANCE.resetGearCollector();
+        } else if (methodNum < 11) {
             methodDone = TT_DriveUtil.INSTANCE.turnRobot(-200, 10);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 9) {
+        } else if (methodNum < 12) {
             methodDone = TT_DriveUtil.INSTANCE.driveStraight(300, 72);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 10) {
+        } else if (methodNum < 13) {
             methodDone = TT_DriveUtil.INSTANCE.turnRobot(200, 4);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 11) {
+        } else if (methodNum < 14) {
             methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(300, 240);
         } else {
             driveBase.tankDrive(0, 0);
@@ -230,14 +310,16 @@ public class TT_Auto {
         if (methodDone == 0) {
             methodNum++;
         }
-        if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 1) {
+        if (methodNum < 1) {
+            methodDone = TT_DriveUtil.INSTANCE.driveStraight(200, 30);
+        } else if (methodNum < 2) {
             methodDone = TT_DriveUtil.INSTANCE.forwardsTurn(100, 20, 30);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 2) {
+        } else if (methodNum < 3) {
             methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(300, 70);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 3) {
+        } else if (methodNum < 4) {
             methodDone = TT_DriveUtil.INSTANCE.forwardsTurn(20, 100, 5);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 4) {
-            counter++;
+        } else if (methodNum < 5) {
+            /*counter++;
             if (counter < 150) {
                 methodDone = TT_DriveUtil.INSTANCE.trackPeg(7);
             } else {
@@ -247,20 +329,25 @@ public class TT_Auto {
                 TT_DriveUtil.INSTANCE.firstRun = true;
                 counter = 0;
                 methodNum++;
-            }
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 5) {
+            }*/
+            methodNum++;
+        } else if (methodNum < 6) {
             methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(200, 24);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 6) {
+        } else if (methodNum < 7) {
             methodDone = TT_Util.pause(30);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 7) {
+        } else if (methodNum < 8) {
+            methodDone = TT_DriveUtil.INSTANCE.dropGear();
+        } else if (methodNum < 9) {
             methodDone = TT_DriveUtil.INSTANCE.driveBackwards(200, 64);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 8) {
+        } else if (methodNum < 10) {
+            methodDone = TT_DriveUtil.INSTANCE.resetGearCollector();
+        } else if (methodNum < 11) {
             methodDone = TT_DriveUtil.INSTANCE.turnRobot(200, 10);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 9) {
+        } else if (methodNum < 12) {
             methodDone = TT_DriveUtil.INSTANCE.driveStraight(300, 72);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 10) {
+        } else if (methodNum < 13) {
             methodDone = TT_DriveUtil.INSTANCE.turnRobot(-200, 8);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 11) {
+        } else if (methodNum < 14) {
             methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(300, 240);
         } else {
             driveBase.tankDrive(0, 0);
@@ -290,18 +377,21 @@ public class TT_Auto {
     }
 
     public static void blueBoilerPeriodic(Joystick controller) {
-
+        System.out.println(methodNum);
         if (methodDone == 0) {
             methodNum++;
         }
-        if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 1) {
+        if (methodNum < 1) {
+            methodDone = TT_DriveUtil.INSTANCE.driveStraight(200, 30);
+
+        } else if (methodNum < 2) {
             methodDone = TT_DriveUtil.INSTANCE.forwardsTurn(100, 20, 30);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 2) {
+        } else if (methodNum < 3) {
             methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(300, 70);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 3) {
+        } else if (methodNum < 4) {
             methodDone = TT_DriveUtil.INSTANCE.forwardsTurn(20, 100, 5);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 4) {
-            counter++;
+        } else if (methodNum < 5) {
+            /*counter++;
             if (counter < 150) {
                 methodDone = TT_DriveUtil.INSTANCE.trackPeg(7);
             } else {
@@ -311,20 +401,26 @@ public class TT_Auto {
                 TT_DriveUtil.INSTANCE.firstRun = true;
                 counter = 0;
                 methodNum++;
-            }
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 5) {
+            }*/
+            methodNum++;
+            methodDone = 0;
+        } else if (methodNum < 6) {
             methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(200, 24);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 6) {
+        } else if (methodNum < 7) {
             methodDone = TT_Util.pause(30);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 7) {
+        } else if (methodNum < 8) {
+            methodDone = TT_DriveUtil.INSTANCE.dropGear();
+        } else if (methodNum < 9) {
             methodDone = TT_DriveUtil.INSTANCE.driveBackwards(200, 48);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 8) {
+        } else if (methodNum < 10) {
+            methodDone = TT_DriveUtil.INSTANCE.resetGearCollector();
+        } else if (methodNum < 11) {
             methodDone = TT_DriveUtil.INSTANCE.turnRobot(200, 10);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 9) {
+        } else if (methodNum < 12) {
             methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(300, 120);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 10) {
+        } else if (methodNum < 13) {
             methodDone = TT_DriveUtil.INSTANCE.turnRobot(-200, 10);
-        } else if (controller.getRawButton(CONTROLLER_A_BUTTON) && methodNum < 11) {
+        } else if (methodNum < 14) {
             methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(300, 240);
         } else {
             leftDrive.disable();
@@ -336,11 +432,110 @@ public class TT_Auto {
         SmartDashboard.putNumber("Right", rightDriveTalons.get());
     }
 
-    public static void blueFeederInit() {
+    public static void breakBaselinePeriodic() {
+        if (methodDone == 0) {
+            methodNum++;
+        }
 
+        if (methodNum < 1) {
+            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(300, 96);
+        } else {
+            leftDrive.disable();
+            rightDrive.disable();
+            driveBase.tankDrive(0, 0);
+        }
     }
 
-    public static void blueFeederPeriodic() {
-        
+    public static void genericInit() {
+        driveEncoderRight.setReverseDirection(true);
+        //driveEncoderRight.setDistancePerPulse(0.0005142918);
+        //driveEncoderLeft.setDistancePerPulse(0.0005142918);
+
+        driveEncoderLeft.reset();
+        driveEncoderRight.reset();
+
+        leftDrive.enable();
+        rightDrive.enable();
+
+        SmartDashboard.putData("PID", leftDrive);
+        SmartDashboard.putNumber("Encoder", driveEncoderLeft.getRate());
+
+        methodDone = 1;
+        methodNum = 0;
+        counter = 0;
+    }
+
+    public static void middleGear() {
+        if (methodDone == 0) {
+            methodNum++;
+        }
+
+        if (methodNum < 1) {
+            methodDone = TT_DriveUtil.INSTANCE.driveStraight(200, 70.5);
+            gearPivot.set(-0.1);
+        } else if (methodNum < 2) {
+            methodDone = TT_Util.pause(50);
+        } else if (methodNum < 3) {
+            methodDone = TT_DriveUtil.INSTANCE.dropGear();
+        } else if (methodNum < 4) {
+            methodDone = TT_DriveUtil.INSTANCE.driveBackwards(300, 48);
+        } else if (methodNum < 5) {
+            methodDone = TT_DriveUtil.INSTANCE.resetGearCollector();
+        } else {
+            driveBase.tankDrive(0, 0);
+        }
+    }
+
+    public static void twoGearAutoRight(Joystick controller) {
+        if (methodNum < 2) {
+            methodDone = TT_DriveUtil.INSTANCE.driveStraight(350, 75);
+        } else if (methodNum < 3) {
+            methodDone = TT_Util.pause(15);
+        } else if (methodNum < 4) {
+            methodDone = TT_DriveUtil.INSTANCE.driveBackwards(450, 48);
+        } else if (methodNum < 5) {
+            methodDone = TT_DriveUtil.INSTANCE.turnRobot(-300, 24);
+        } else if (methodNum < 6) {
+            if (counter < 75) {
+                methodDone = TT_DriveUtil.INSTANCE.trackGear();
+            } else {
+                methodDone = 0;
+                counter = 0;
+            }
+            counter++;
+        } else if (methodNum < 7) {
+            methodDone = TT_DriveUtil.INSTANCE.forwardTrackGear();
+        } else if (methodNum < 8) {
+            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(100, 10);
+        } else if (methodNum < 9) {
+            methodDone = TT_DriveUtil.INSTANCE.driveBackwards(450, 20);
+        } else if (methodNum < 10) {
+            methodDone = TT_DriveUtil.INSTANCE.turnRobot(250, 30);
+        } else if (methodNum < 11) {
+            methodDone = TT_DriveUtil.INSTANCE.trackPeg(7);
+        } else if (methodNum < 12) {
+            methodDone = TT_DriveUtil.INSTANCE.driveStraightAndCoast(350, 48);
+        } else if (methodNum < 13) {
+            methodDone = 0;//TT_DriveUtil.INSTANCE.trackPeg(3);
+        } else if (methodNum < 14) {
+            methodDone = 0; //TT_DriveUtil.INSTANCE.driveStraightAndCoast(350, 15);
+        } else {
+            methodDone = 1;
+            driveBase.tankDrive(0, 0);
+        }
+        SmartDashboard.putData("PID", leftDrive);
+        SmartDashboard.putNumber("Encoder", TT_Util.convertTicksToRPMs(driveEncoderLeft.getRate()));
+        SmartDashboard.putNumber("right", TT_Util.convertTicksToRPMs(driveEncoderRight.getRate()));
+
+
+        SmartDashboard.putNumber("Left", leftDriveTalons.get());
+        SmartDashboard.putNumber("Right", rightDriveTalons.get());
+        SmartDashboard.putNumber("Right Encoder Val", driveEncoderRight.get());
+
+        if (methodDone == 0) {
+            methodNum++;
+            methodDone = 1;
+        }
+
     }
 }

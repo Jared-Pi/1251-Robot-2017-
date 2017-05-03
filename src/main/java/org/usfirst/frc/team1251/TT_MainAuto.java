@@ -29,8 +29,18 @@ public class TT_MainAuto {
     public static int currentReturnVal = 1;
     public static int currentMethodNum = 0;
 
-    public static void autoInit(){
-        currentMethodNum = 0;
+    public static void autoInit(int autoSelect) {
+        switch (autoSelect) {
+            case 4:
+                TT_Auto.twoGearAutoInit();
+                break;
+            case 5:
+                TT_Auto.twoGearAutoInit();
+                break;
+            default:
+                currentMethodNum = 0;
+                TT_Auto.genericInit();
+        }
     }
     public static void auto(int autoSelect, RobotDrive baseDrive, DoubleSolenoid baseShifter, SpeedController pivotMotor, DoubleSolenoid claw, Gyro gyro, Encoder lEncoder, Encoder rEncoder) {
         switch(autoSelect){
@@ -39,17 +49,7 @@ public class TT_MainAuto {
                 break;
 
             case 0:
-                //Baseline breaking auto
-                if (currentReturnVal == 0){
-                    currentMethodNum++;
-                }
-
-                if (currentMethodNum < 1) {
-                    currentReturnVal = TT_Util.driveForward(baseDrive, baseShifter, lEncoder, rEncoder, BASELINE_DISTANCE);
-                } else {
-                    baseDrive.tankDrive(0, 0);
-                }
-                break;
+                TT_Auto.breakBaselinePeriodic();
 
             case 1:
                 // left gear auto here
@@ -80,50 +80,7 @@ public class TT_MainAuto {
 
             case 2:
                 //middle gear auto here
-                if (currentReturnVal == 0){
-                    currentMethodNum++;
-                }
-
-                if (currentMethodNum < 1){
-                    currentReturnVal = TT_Util.driveForward(baseDrive, baseShifter, lEncoder, rEncoder, MIDDLE_GEAR_DISTANCE);
-                }else if (currentMethodNum < 2){
-                    currentReturnVal = TT_Util.pause(25);
-                } else if (currentMethodNum < 3){
-                    currentReturnVal = TT_Util.pause(25);
-                    claw.set(DoubleSolenoid.Value.kReverse);
-                    pivotMotor.set(-0.2);
-                } else if (currentMethodNum < 4){
-                    currentReturnVal = TT_Util.driveBackward(baseDrive, baseShifter, lEncoder, rEncoder, MIDDLE_BACKUP_DISTANCE);
-                }
-                else {
-                    pivotMotor.set(0);
-                    baseDrive.tankDrive(0, 0);
-                    claw.set(DoubleSolenoid.Value.kForward);
-                }
-                break;
-
-            case 4:
-                //middle gear auto here
-                if (currentReturnVal == 0){
-                    currentMethodNum++;
-                }
-
-                if (currentMethodNum < 1){
-                    currentReturnVal = TT_Util.driveForward(baseDrive, baseShifter, lEncoder, rEncoder, MIDDLE_GEAR_DISTANCE+1.2);
-                }else if (currentMethodNum < 2){
-                    currentReturnVal = TT_Util.pause(25);
-                } else if (currentMethodNum < 3){
-                    currentReturnVal = TT_Util.pause(25);
-                    claw.set(DoubleSolenoid.Value.kReverse);
-                    pivotMotor.set(-0.2);
-                } else if (currentMethodNum < 4){
-                    currentReturnVal = TT_Util.driveBackward(baseDrive, baseShifter, lEncoder, rEncoder, MIDDLE_BACKUP_DISTANCE-0.75);
-                }
-                else {
-                    pivotMotor.set(0);
-                    baseDrive.tankDrive(0, 0);
-                    claw.set(DoubleSolenoid.Value.kForward);
-                }
+                TT_Auto.middleGear();
                 break;
 
             case 3:
@@ -153,6 +110,35 @@ public class TT_MainAuto {
                 }
                 break;
 
+            case 4:
+                TT_Auto.twoGearAutoRight(Robot.controller);
+
+            case 5:
+                // 2 gear auto
+                TT_Auto.twoGearAutoPeriodic(Robot.controller);
+                break;
+            case 6:
+                // red loader station
+                TT_Auto.redLoaderStationPeriodic(Robot.controller);
+                break;
+            case 7:
+                // red boiler auto
+                TT_Auto.redBoilerAutoPeriodic(Robot.controller);
+                break;
+            case 8:
+                // blue boiler auto
+                TT_Auto.blueBoilerPeriodic(Robot.controller);
+                break;
+            case 9:
+                // blue loader station
+                TT_Auto.blueLoaderStationPeriodic(Robot.controller);
+                break;
+            case 10:
+                if (Robot.controller.getRawButton(Robot.CONTROLLER_A_BUTTON)) {
+                    TT_DriveUtil.INSTANCE.trackGear();
+                } else {
+                    baseDrive.tankDrive(0, 0);
+                }
         }
     }
 }
