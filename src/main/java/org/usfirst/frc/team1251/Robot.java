@@ -174,6 +174,8 @@ public class Robot extends IterativeRobot {
         gyro = new ADXRS450_Gyro();
         gyro.calibrate();
         SmartDashboard.putNumber("Auto", -1);
+        SmartDashboard.putNumber("Controllers", -1);
+
 
         UsbCamera camera = new UsbCamera("cam", 0);
         camera.setFPS(60);
@@ -230,11 +232,19 @@ public class Robot extends IterativeRobot {
     public void teleopPeriodic() {
         if (controlerAmount == 1) {
             //Subsystem 1, Drivebase
-            TT_Drive.drive(controller, driveBase);
+            TT_Drive.drive2(controller, driveBase);
             //TT_Drive.shifter(driveEncoderLeft, driveEncoderRight, driveBaseShifter);
-            if (controller.getRawButton(CONTROLLER_RIGHT_BUMPER) || controller.getRawButton(CONTROLLER_RIGHT_TRIGGER)) {
+            if (controller.getRawButton(CONTROLLER_SELECT_BUTTON) || controller.getRawButton(CONTROLLER_START_BUTTON)) {
+                lockControls = true;
+            }
+            else if (controller.getRawButton(CONTROLLER_Y_BUTTON)) {
+                lockControls = false;
+            }
+
+            if (lockControls) {
                 TT_Hanger.hang2(controller, hanger, hangLimit, gearPivot);
-            } else {
+            }
+            else if (!lockControls) {
                 hanger.set(0);
                 TT_GearCollector.collectGearFloor2(controller, gearCollector, gearPivot, gearClaw, gearPot);
             }
@@ -251,6 +261,8 @@ public class Robot extends IterativeRobot {
                 TT_GearCollector.collectGearFloor(stick, gearCollector, gearPivot, gearClaw, gearPot);
             }
         }
+
+        else {}
 
         SmartDashboard.putNumber("Left encoder rate", TT_Util.convertTicksToRPMs(driveEncoderLeft.getRate()));
         SmartDashboard.putNumber("Right encoder rate", TT_Util.convertTicksToRPMs(driveEncoderRight.getRate()));

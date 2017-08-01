@@ -54,6 +54,36 @@ public class TT_Drive {
         }
     }
 
+    public static void drive2(Joystick controller, RobotDrive base) {
+
+        if(controller.getRawAxis(CONTROLLER_LEFT_AXIS)*abs(controller.getRawAxis(CONTROLLER_LEFT_AXIS))<DRIVE_MINIMUM) {
+            lAxis = controller.getRawAxis(CONTROLLER_LEFT_AXIS);
+        }
+        else {
+            lAxis = controller.getRawAxis(CONTROLLER_LEFT_AXIS)*abs(controller.getRawAxis(CONTROLLER_LEFT_AXIS));
+        }
+        if(controller.getRawAxis(CONTROLLER_RIGHT_AXIS)*abs(controller.getRawAxis(CONTROLLER_RIGHT_AXIS))<DRIVE_MINIMUM) {
+            rAxis = controller.getRawAxis(CONTROLLER_RIGHT_AXIS);
+        }
+        else {
+            rAxis = controller.getRawAxis(CONTROLLER_RIGHT_AXIS)*abs(controller.getRawAxis(CONTROLLER_RIGHT_AXIS));
+        }
+
+        if (controller.getRawButton(CONTROLLER_RIGHT_BUMPER)) {
+            lAxis *= 0.6;
+            rAxis *= 0.6;
+        }
+
+        base.tankDrive(lAxis * DRIVE_MULTIPLIER, rAxis * DRIVE_MULTIPLIER);
+
+        if (controller.getRawButton(CONTROLLER_B_BUTTON)){
+            Robot.driveBaseShifter.set(HIGH_GEAR);
+        }
+        else if (controller.getRawButton(CONTROLLER_X_BUTTON)){
+            Robot.driveBaseShifter.set(LOW_GEAR);
+        }
+    }
+
     public static void shifter(Encoder left, Encoder right, DoubleSolenoid solenoid) {
         double nLeft = TT_Util.convertTicksToRPMs(left.getRate());
         double nRight = TT_Util.convertTicksToRPMs(right.getRate());
